@@ -1,7 +1,30 @@
+import React from 'react';
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { Platform } from 'react-native';
+import { Platform, View, Text, StyleSheet } from 'react-native';
 import { colors } from '@/constants/theme';
+
+interface DockIconProps {
+  name: keyof typeof Ionicons.glyphMap;
+  focusedName: keyof typeof Ionicons.glyphMap;
+  focused: boolean;
+  color: any;
+  badge?: number;
+}
+
+function DockIcon({ name, focusedName, focused, color, badge }: DockIconProps) {
+  return (
+    <View style={[styles.dockIconBox, focused && styles.dockIconBoxActive]}>
+      <Ionicons name={focused ? focusedName : name} size={22} color={color} />
+      {badge ? (
+        <View style={styles.badge}>
+          <Text style={styles.badgeText}>{badge}</Text>
+        </View>
+      ) : null}
+      {focused && <View style={styles.activeGlowDot} />}
+    </View>
+  );
+}
 
 export default function TabLayout() {
   return (
@@ -10,17 +33,32 @@ export default function TabLayout() {
         headerShown: false,
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.textMuted,
+        tabBarHideOnKeyboard: true,
         tabBarStyle: {
-          backgroundColor: colors.tabBar,
-          borderTopColor: colors.tabBarBorder,
-          borderTopWidth: 1,
-          height: Platform.OS === 'ios' ? 88 : 64,
-          paddingBottom: Platform.OS === 'ios' ? 28 : 10,
+          position: 'absolute',
+          bottom: Platform.OS === 'ios' ? 24 : 16,
+          left: 16,
+          right: 16,
+          height: 68,
+          borderRadius: 34,
+          backgroundColor: '#111A2C',
+          borderWidth: 1.5,
+          borderColor: '#22324D',
+          borderTopWidth: 1.5,
+          borderTopColor: '#22324D',
+          elevation: 12,
+          shadowColor: '#000000',
+          shadowOffset: { width: 0, height: 10 },
+          shadowOpacity: 0.5,
+          shadowRadius: 18,
+          paddingHorizontal: 10,
+          paddingBottom: Platform.OS === 'ios' ? 12 : 8,
           paddingTop: 8,
         },
         tabBarLabelStyle: {
-          fontSize: 12,
-          fontWeight: '600',
+          fontSize: 11,
+          fontWeight: '700',
+          marginTop: -2,
         },
       }}
     >
@@ -29,9 +67,10 @@ export default function TabLayout() {
         options={{
           title: 'Home',
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons
-              name={focused ? 'home' : 'home-outline'}
-              size={24}
+            <DockIcon
+              name="home-outline"
+              focusedName="home"
+              focused={focused}
               color={color}
             />
           ),
@@ -42,10 +81,12 @@ export default function TabLayout() {
         options={{
           title: 'Betslip',
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons
-              name={focused ? 'receipt' : 'receipt-outline'}
-              size={24}
+            <DockIcon
+              name="receipt-outline"
+              focusedName="receipt"
+              focused={focused}
               color={color}
+              badge={2}
             />
           ),
         }}
@@ -55,9 +96,10 @@ export default function TabLayout() {
         options={{
           title: 'Following',
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons
-              name={focused ? 'star' : 'star-outline'}
-              size={24}
+            <DockIcon
+              name="star-outline"
+              focusedName="star"
+              focused={focused}
               color={color}
             />
           ),
@@ -68,9 +110,10 @@ export default function TabLayout() {
         options={{
           title: 'Profile',
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons
-              name={focused ? 'person' : 'person-outline'}
-              size={24}
+            <DockIcon
+              name="person-outline"
+              focusedName="person"
+              focused={focused}
               color={color}
             />
           ),
@@ -80,3 +123,41 @@ export default function TabLayout() {
   );
 }
 
+const styles = StyleSheet.create({
+  dockIconBox: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 44,
+    height: 36,
+    borderRadius: 18,
+    position: 'relative',
+  },
+  dockIconBoxActive: {
+    backgroundColor: 'rgba(0, 210, 106, 0.12)',
+  },
+  activeGlowDot: {
+    position: 'absolute',
+    bottom: 2,
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: colors.primary,
+  },
+  badge: {
+    position: 'absolute',
+    top: 2,
+    right: 4,
+    backgroundColor: colors.primary,
+    minWidth: 16,
+    height: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 3,
+  },
+  badgeText: {
+    color: colors.background,
+    fontSize: 9,
+    fontWeight: '800',
+  },
+});
