@@ -40,14 +40,6 @@ yarn-error.*
 /ios
 /android
 
-# Laravel backend
-backend/vendor/
-backend/.env
-backend/.env.*
-backend/database/*.sqlite*
-backend/storage/*.key
-backend/storage/logs/*.log
-backend/storage/framework/cache/*
-backend/storage/framework/sessions/*
-backend/storage/framework/views/*
-backend/public/storage
+# Laravel backend repository (tracked separately at https://github.com/beastcodes27/betika-backend.git)
+backend/
+
