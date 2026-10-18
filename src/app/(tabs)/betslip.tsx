@@ -13,6 +13,7 @@ import { colors } from '@/constants/theme';
 import { MOCK_SLIPS, TipsterSlip } from '@/data/mockSlips';
 import { useAppUI } from '@/context/UIContext';
 import BookmakerLogo from '@/components/BookmakerLogo';
+import TipsterAvatar from '@/components/TipsterAvatar';
 
 type CategoryFilter = 'All' | 'Free' | 'Banker' | 'Goals' | 'VIP';
 
@@ -220,9 +221,14 @@ export default function BetslipScreen() {
           <View key={slip.id} style={styles.slipCard}>
             {/* 1. Tipster Profile Header */}
             <View style={styles.tipsterRow}>
-              <View style={[styles.avatar, { backgroundColor: slip.tipster.avatarBg }]}>
-                <Text style={styles.avatarText}>{slip.tipster.name.charAt(0)}</Text>
-              </View>
+              <TipsterAvatar
+                name={slip.tipster.name}
+                source={slip.tipster.avatarUrl}
+                avatarBg={slip.tipster.avatarBg}
+                size="md"
+                showVerifiedBadge={slip.tipster.verified}
+                style={{ marginRight: 12 }}
+              />
 
               <View style={styles.tipsterInfo}>
                 <View style={styles.nameRow}>
@@ -359,17 +365,26 @@ export default function BetslipScreen() {
                 <>
                   {/* Modal Header */}
                   <View style={styles.modalHeader}>
-                    <View>
-                      <View style={styles.modalHeaderTagRow}>
-                        <Text style={styles.modalSubtitle}>{activeSlip.tipster.name}&apos;S BETSLIP</Text>
-                        {!unlocked && !activeSlip.isFree && (
-                          <View style={styles.vipExclusivePill}>
-                            <Ionicons name="sparkles" size={10} color={colors.gold} />
-                            <Text style={styles.vipExclusiveText}>VIP PASS</Text>
-                          </View>
-                        )}
+                    <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1, gap: 12 }}>
+                      <TipsterAvatar
+                        name={activeSlip.tipster.name}
+                        source={activeSlip.tipster.avatarUrl}
+                        avatarBg={activeSlip.tipster.avatarBg}
+                        size="md"
+                        showVerifiedBadge={activeSlip.tipster.verified}
+                      />
+                      <View style={{ flex: 1 }}>
+                        <View style={styles.modalHeaderTagRow}>
+                          <Text style={styles.modalSubtitle}>{activeSlip.tipster.name}&apos;S BETSLIP</Text>
+                          {!unlocked && !activeSlip.isFree && (
+                            <View style={styles.vipExclusivePill}>
+                              <Ionicons name="sparkles" size={10} color={colors.gold} />
+                              <Text style={styles.vipExclusiveText}>VIP PASS</Text>
+                            </View>
+                          )}
+                        </View>
+                        <Text style={styles.modalTitle} numberOfLines={1}>{activeSlip.title}</Text>
                       </View>
-                      <Text style={styles.modalTitle}>{activeSlip.title}</Text>
                     </View>
                     <TouchableOpacity
                       onPress={() => setActiveSlip(null)}

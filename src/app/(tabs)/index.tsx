@@ -23,6 +23,7 @@ import {
 } from '@/data/mockSlips';
 import { useAppUI } from '@/context/UIContext';
 import BookmakerLogo from '@/components/BookmakerLogo';
+import TipsterAvatar from '@/components/TipsterAvatar';
 
 type TipsterFilterChip = 'all' | 'high_win' | 'top_rated' | 'vip';
 
@@ -453,9 +454,13 @@ export default function HomeScreen() {
                 <View key={tipster.id} style={styles.tipsterResultCard}>
                   <View style={styles.tipsterCardTop}>
                     <View style={styles.tipsterProfileGroup}>
-                      <View style={[styles.tipsterAvatar, { backgroundColor: tipster.avatarBg }]}>
-                        <Text style={styles.tipsterAvatarText}>{tipster.name.substring(0, 1)}</Text>
-                      </View>
+                      <TipsterAvatar
+                        name={tipster.name}
+                        source={tipster.avatarUrl}
+                        avatarBg={tipster.avatarBg}
+                        size="md"
+                        showVerifiedBadge={tipster.verified}
+                      />
                       <View>
                         <View style={styles.tipsterNameRow}>
                           <Text style={styles.tipsterName}>{tipster.name}</Text>
@@ -537,11 +542,14 @@ export default function HomeScreen() {
                     activeOpacity={0.8}
                     onPress={() => setSearchQuery(tipster.name)}
                   >
-                    <View style={[styles.tipsterMiniAvatar, { backgroundColor: tipster.avatarBg }]}>
-                      <Text style={styles.tipsterMiniAvatarText}>
-                        {tipster.name.substring(0, 1)}
-                      </Text>
-                    </View>
+                    <TipsterAvatar
+                      name={tipster.name}
+                      source={tipster.avatarUrl}
+                      avatarBg={tipster.avatarBg}
+                      size="md"
+                      showVerifiedBadge={tipster.verified}
+                      style={{ marginBottom: 6 }}
+                    />
                     <Text style={styles.tipsterMiniName} numberOfLines={1}>
                       {tipster.name}
                     </Text>
