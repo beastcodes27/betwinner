@@ -385,4 +385,93 @@ export const FOLLOWED_TIPSTERS: FollowedTipster[] = [
   },
 ];
 
+export interface HomeAd {
+  id: string;
+  badge: string;
+  title: string;
+  subtitle: string;
+  highlight: string;
+  ctaText: string;
+  promoCode?: string;
+}
+
+export const HOME_ADS: HomeAd[] = [
+  {
+    id: 'ad-1',
+    badge: 'BETIKA MIDWEEK JACKPOT',
+    title: 'KES 15,000,000 Super Jackpot',
+    subtitle: '15 matches analyzed by VIP tipsters with full 1X2 combinations & form guides.',
+    highlight: 'KES 50 Stake • 100% Free First Slip',
+    ctaText: 'View Jackpot Slip',
+    promoCode: 'JACKPOT15M',
+  },
+  {
+    id: 'ad-2',
+    badge: 'M-PESA CASHBACK PROMO',
+    title: '50% Instant Cashback on All Slips',
+    subtitle: 'Top up your wallet or purchase any premium tipster slip and receive instant M-Pesa rebate.',
+    highlight: 'No minimum deposit • Auto-credited',
+    ctaText: 'Deposit with M-Pesa',
+    promoCode: 'CASHBACK50',
+  },
+  {
+    id: 'ad-3',
+    badge: 'VIP CLUB PASS',
+    title: 'Join Elite 90%+ Win Rate Channel',
+    subtitle: 'Get daily morning banker slips directly with Betika & SportyBet booking codes.',
+    highlight: 'Limited spots • Weekend VIP access',
+    ctaText: 'Claim VIP Pass',
+    promoCode: 'ELITEVIP',
+  },
+];
+
+export const ALL_TIPSTERS: FollowedTipster[] = [
+  ...FOLLOWED_TIPSTERS,
+  {
+    id: 'tipster-6',
+    name: 'King of Draws',
+    handle: '@kingdraws',
+    avatarBg: '#F59E0B',
+    winRate: '78% Win Rate',
+    badge: 'DRAW MASTER ⚖️',
+    followers: '19.4k',
+    verified: true,
+    specialty: 'Draws & High Value Singles',
+    streak: '6W Streak',
+    activeSlipsCount: 3,
+    notificationsEnabled: false,
+    isFollowing: false,
+  },
+  {
+    id: 'tipster-7',
+    name: 'Stats Wizard',
+    handle: '@statswiz',
+    avatarBg: '#EC4899',
+    winRate: '89% Win Rate',
+    badge: 'CORNER & CARDS 🟨',
+    followers: '27.1k',
+    verified: true,
+    specialty: 'Corner counts and card builder props',
+    streak: '8W Streak',
+    activeSlipsCount: 4,
+    notificationsEnabled: true,
+    isFollowing: false,
+  },
+  {
+    id: 'tipster-8',
+    name: 'Bet Master Pro',
+    handle: '@betmaster_ke',
+    avatarBg: '#10B981',
+    winRate: '93% Win Rate',
+    badge: 'TOP RATED 🏆',
+    followers: '52.8k',
+    verified: true,
+    specialty: 'EPL & Champions League Mega Accumulators',
+    streak: '11W Streak',
+    activeSlipsCount: 5,
+    notificationsEnabled: false,
+    isFollowing: false,
+  },
+];
+
 

@@ -1,107 +1,483 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  TextInput,
+  Alert,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '@/constants/theme';
+import { HOME_ADS, ALL_TIPSTERS, FollowedTipster } from '@/data/mockSlips';
+
+type TipsterFilterChip = 'all' | 'high_win' | 'top_rated' | 'vip';
 
 export default function HomeScreen() {
+  const [currentAdIndex, setCurrentAdIndex] = useState(0);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedChip, setSelectedChip] = useState<TipsterFilterChip>('all');
+  const [tipsters, setTipsters] = useState<FollowedTipster[]>(ALL_TIPSTERS);
+  const [addedSlips, setAddedSlips] = useState<string[]>([]);
+
+  const currentAd = HOME_ADS[currentAdIndex];
+
+  const handleNextAd = () => {
+    setCurrentAdIndex((prev) => (prev + 1) % HOME_ADS.length);
+  };
+
+  const handlePrevAd = () => {
+    setCurrentAdIndex((prev) => (prev - 1 + HOME_ADS.length) % HOME_ADS.length);
+  };
+
+  const handleToggleFollow = (id: string) => {
+    setTipsters((prev) =>
+      prev.map((t) => (t.id === id ? { ...t, isFollowing: !t.isFollowing } : t))
+    );
+  };
+
+  const handleToggleAddToSlip = (id: string) => {
+    if (addedSlips.includes(id)) {
+      setAddedSlips((prev) => prev.filter((item) => item !== id));
+    } else {
+      setAddedSlips((prev) => [...prev, id]);
+    }
+  };
+
+  // Filtered tipsters based on search query and chip filter
+  const filteredTipsters = tipsters.filter((tipster) => {
+    const matchesQuery =
+      searchQuery.trim() === '' ||
+      tipster.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      tipster.handle.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      tipster.specialty.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      tipster.badge.toLowerCase().includes(searchQuery.toLowerCase());
+
+    if (!matchesQuery) return false;
+
+    if (selectedChip === 'high_win') {
+      const rate = parseInt(tipster.winRate.replace(/\D/g, ''), 10);
+      return rate >= 85;
+    }
+    if (selectedChip === 'top_rated') {
+      return tipster.verified;
+    }
+    if (selectedChip === 'vip') {
+      return tipster.badge.includes('VIP') || tipster.badge.includes('TOP');
+    }
+    return true;
+  });
+
+  const isSearching = searchQuery.trim().length > 0;
+
   return (
     <SafeAreaView style={styles.safeArea}>
+      {/* Top Header */}
       <View style={styles.header}>
         <View>
-          <Text style={styles.headerSub}>DAILY WINNING PREDICTIONS</Text>
+          <Text style={styles.headerSub}>KENYA&apos;S #1 TIPSTER NETWORK</Text>
           <Text style={styles.headerTitle}>BETWINNER</Text>
         </View>
-        <TouchableOpacity style={styles.notificationBtn} activeOpacity={0.7}>
+        <TouchableOpacity
+          style={styles.notificationBtn}
+          activeOpacity={0.7}
+          onPress={() => Alert.alert('Notifications', 'You have 3 new tip alerts from followed tipsters.')}
+        >
           <Ionicons name="notifications-outline" size={22} color={colors.text} />
           <View style={styles.badgeDot} />
         </TouchableOpacity>
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        {/* Banner */}
-        <View style={styles.bannerCard}>
-          <View style={styles.bannerInfo}>
-            <View style={styles.tag}>
-              <Text style={styles.tagText}>{"TODAY'S HIGHLIGHT"}</Text>
+        {/* ========================================================================= */}
+        {/* 1. TOP ADVERTISING BOARD */}
+        {/* ========================================================================= */}
+        <View style={styles.adBoardCard}>
+          {/* Ad Card Header */}
+          <View style={styles.adTopBar}>
+            <View style={styles.sponsoredBadge}>
+              <Ionicons name="megaphone" size={12} color={colors.gold} />
+              <Text style={styles.sponsoredBadgeText}>SPONSORED PROMO</Text>
             </View>
-            <Text style={styles.bannerTitle}>Banker of the Day</Text>
-            <Text style={styles.bannerOdds}>Odds: 1.85 • 88% Confidence</Text>
-          </View>
-          <Ionicons name="shield-checkmark" size={44} color={colors.secondary} />
-        </View>
 
-        {/* Section title */}
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Featured Tips</Text>
-          <TouchableOpacity>
-            <Text style={styles.seeAllText}>See all</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Match tip card 1 */}
-        <View style={styles.tipCard}>
-          <View style={styles.cardHeader}>
-            <Text style={styles.leagueText}>PREMIER LEAGUE • 19:30</Text>
-            <View style={styles.confidenceBadge}>
-              <Text style={styles.confidenceText}>85% Confidence</Text>
-            </View>
-          </View>
-
-          <View style={styles.matchTeams}>
-            <View style={styles.teamRow}>
-              <Text style={styles.teamName}>Arsenal</Text>
-              <Text style={styles.teamOdds}>1.65</Text>
-            </View>
-            <View style={styles.teamRow}>
-              <Text style={styles.teamName}>Chelsea</Text>
-              <Text style={styles.teamOdds}>4.20</Text>
+            {/* Slide Indicators & Controls */}
+            <View style={styles.adControlsRow}>
+              <TouchableOpacity onPress={handlePrevAd} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+                <Ionicons name="chevron-back" size={16} color={colors.textSecondary} />
+              </TouchableOpacity>
+              <View style={styles.dotsRow}>
+                {HOME_ADS.map((ad, idx) => (
+                  <TouchableOpacity
+                    key={ad.id}
+                    onPress={() => setCurrentAdIndex(idx)}
+                    style={[
+                      styles.dot,
+                      currentAdIndex === idx ? styles.dotActive : styles.dotInactive,
+                    ]}
+                  />
+                ))}
+              </View>
+              <TouchableOpacity onPress={handleNextAd} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+                <Ionicons name="chevron-forward" size={16} color={colors.textSecondary} />
+              </TouchableOpacity>
             </View>
           </View>
 
-          <View style={styles.cardFooter}>
-            <View style={styles.predictionBox}>
-              <Text style={styles.predictionLabel}>TIP:</Text>
-              <Text style={styles.predictionValue}>Home Win (1)</Text>
+          {/* Ad Body */}
+          <View style={styles.adContent}>
+            <View style={styles.adCategoryPill}>
+              <Text style={styles.adCategoryText}>{currentAd.badge}</Text>
             </View>
-            <TouchableOpacity style={styles.addToSlipBtn} activeOpacity={0.7}>
-              <Ionicons name="add-circle-outline" size={18} color={colors.textOnPrimary} />
-              <Text style={styles.addToSlipText}>Add to slip</Text>
+            <Text style={styles.adTitle}>{currentAd.title}</Text>
+            <Text style={styles.adSubtitle}>{currentAd.subtitle}</Text>
+
+            {/* Ad Highlight Box */}
+            <View style={styles.adHighlightBox}>
+              <Ionicons name="sparkles" size={14} color={colors.secondary} />
+              <Text style={styles.adHighlightText}>{currentAd.highlight}</Text>
+            </View>
+          </View>
+
+          {/* Ad Footer & CTA */}
+          <View style={styles.adFooter}>
+            {currentAd.promoCode && (
+              <View style={styles.promoCodeBox}>
+                <Text style={styles.promoCodeLabel}>CODE:</Text>
+                <Text style={styles.promoCodeValue}>{currentAd.promoCode}</Text>
+              </View>
+            )}
+            <TouchableOpacity
+              style={styles.adCtaBtn}
+              activeOpacity={0.8}
+              onPress={() =>
+                Alert.alert(
+                  currentAd.title,
+                  `${currentAd.subtitle}\n\nPromo code ${currentAd.promoCode || 'AUTO'} applied to your account!`
+                )
+              }
+            >
+              <Text style={styles.adCtaText}>{currentAd.ctaText}</Text>
+              <Ionicons name="arrow-forward" size={14} color={colors.textOnPrimary} />
             </TouchableOpacity>
           </View>
         </View>
 
-        {/* Match tip card 2 */}
-        <View style={styles.tipCard}>
-          <View style={styles.cardHeader}>
-            <Text style={styles.leagueText}>LA LIGA • 21:00</Text>
-            <View style={styles.confidenceBadge}>
-              <Text style={styles.confidenceText}>80% Confidence</Text>
-            </View>
+        {/* ========================================================================= */}
+        {/* 2. TIPSTER SEARCH BAR */}
+        {/* ========================================================================= */}
+        <View style={styles.searchSection}>
+          <View style={styles.searchBar}>
+            <Ionicons name="search" size={20} color={colors.primary} />
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Search tipsters by name, handle, or sport..."
+              placeholderTextColor={colors.textMuted}
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              returnKeyType="search"
+              clearButtonMode="while-editing"
+            />
+            {searchQuery.length > 0 && (
+              <TouchableOpacity onPress={() => setSearchQuery('')} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+                <Ionicons name="close-circle" size={19} color={colors.textSecondary} />
+              </TouchableOpacity>
+            )}
           </View>
 
-          <View style={styles.matchTeams}>
-            <View style={styles.teamRow}>
-              <Text style={styles.teamName}>Real Madrid</Text>
-              <Text style={styles.teamOdds}>1.52</Text>
-            </View>
-            <View style={styles.teamRow}>
-              <Text style={styles.teamName}>Barcelona</Text>
-              <Text style={styles.teamOdds}>2.40</Text>
-            </View>
-          </View>
-
-          <View style={styles.cardFooter}>
-            <View style={styles.predictionBox}>
-              <Text style={styles.predictionLabel}>TIP:</Text>
-              <Text style={styles.predictionValue}>Over 2.5 Goals</Text>
-            </View>
-            <TouchableOpacity style={styles.addToSlipBtn} activeOpacity={0.7}>
-              <Ionicons name="add-circle-outline" size={18} color={colors.textOnPrimary} />
-              <Text style={styles.addToSlipText}>Add to slip</Text>
-            </TouchableOpacity>
-          </View>
+          {/* Quick Filter Chips */}
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.filterChipsRow}
+          >
+            {(
+              [
+                { id: 'all', label: 'All Tipsters' },
+                { id: 'high_win', label: '🔥 85%+ Win Rate' },
+                { id: 'top_rated', label: '✓ Verified Pros' },
+                { id: 'vip', label: '👑 VIP Specialists' },
+              ] as { id: TipsterFilterChip; label: string }[]
+            ).map((chip) => (
+              <TouchableOpacity
+                key={chip.id}
+                style={[
+                  styles.filterChip,
+                  selectedChip === chip.id && styles.filterChipActive,
+                ]}
+                onPress={() => setSelectedChip(chip.id)}
+                activeOpacity={0.7}
+              >
+                <Text
+                  style={[
+                    styles.filterChipText,
+                    selectedChip === chip.id && styles.filterChipTextActive,
+                  ]}
+                >
+                  {chip.label}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
         </View>
+
+        {/* ========================================================================= */}
+        {/* 3. SEARCH RESULTS (Active Search View) */}
+        {/* ========================================================================= */}
+        {isSearching || selectedChip !== 'all' ? (
+          <View style={styles.searchResultsContainer}>
+            <View style={styles.resultsHeaderRow}>
+              <Text style={styles.resultsHeaderTitle}>
+                {filteredTipsters.length}{' '}
+                {filteredTipsters.length === 1 ? 'Tipster Found' : 'Tipsters Found'}
+              </Text>
+              {(isSearching || selectedChip !== 'all') && (
+                <TouchableOpacity
+                  onPress={() => {
+                    setSearchQuery('');
+                    setSelectedChip('all');
+                  }}
+                >
+                  <Text style={styles.clearSearchText}>Reset</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+
+            {filteredTipsters.length === 0 ? (
+              <View style={styles.emptySearchBox}>
+                <Ionicons name="search-outline" size={44} color={colors.textMuted} />
+                <Text style={styles.emptySearchTitle}>No Tipsters Found</Text>
+                <Text style={styles.emptySearchSub}>
+                  No tipsters match &quot;{searchQuery}&quot;. Try searching for &quot;Captain&quot;, &quot;Sniper&quot;, or &quot;VIP&quot;.
+                </Text>
+              </View>
+            ) : (
+              filteredTipsters.map((tipster) => (
+                <View key={tipster.id} style={styles.tipsterResultCard}>
+                  <View style={styles.tipsterCardTop}>
+                    <View style={styles.tipsterProfileGroup}>
+                      <View style={[styles.tipsterAvatar, { backgroundColor: tipster.avatarBg }]}>
+                        <Text style={styles.tipsterAvatarText}>{tipster.name.substring(0, 1)}</Text>
+                      </View>
+                      <View>
+                        <View style={styles.tipsterNameRow}>
+                          <Text style={styles.tipsterName}>{tipster.name}</Text>
+                          {tipster.verified && (
+                            <Ionicons name="checkmark-circle" size={15} color={colors.secondary} />
+                          )}
+                        </View>
+                        <Text style={styles.tipsterHandle}>{tipster.handle}</Text>
+                      </View>
+                    </View>
+
+                    {/* Follow Action */}
+                    <TouchableOpacity
+                      style={[
+                        styles.tipsterFollowBtn,
+                        tipster.isFollowing && styles.tipsterFollowBtnActive,
+                      ]}
+                      onPress={() => handleToggleFollow(tipster.id)}
+                      activeOpacity={0.8}
+                    >
+                      <Ionicons
+                        name={tipster.isFollowing ? 'checkmark' : 'add'}
+                        size={14}
+                        color={tipster.isFollowing ? colors.secondary : colors.textOnPrimary}
+                      />
+                      <Text
+                        style={[
+                          styles.tipsterFollowText,
+                          tipster.isFollowing && styles.tipsterFollowTextActive,
+                        ]}
+                      >
+                        {tipster.isFollowing ? 'Following' : 'Follow'}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+
+                  {/* Metrics Badges */}
+                  <View style={styles.tipsterMetricsRow}>
+                    <View style={styles.winRateBadge}>
+                      <Ionicons name="trending-up" size={12} color={colors.secondary} />
+                      <Text style={styles.winRateText}>{tipster.winRate}</Text>
+                    </View>
+                    <View style={styles.streakBadge}>
+                      <Text style={styles.streakText}>{tipster.streak}</Text>
+                    </View>
+                    <View style={styles.slipsBadge}>
+                      <Text style={styles.slipsBadgeText}>{tipster.activeSlipsCount} Slips Live</Text>
+                    </View>
+                  </View>
+
+                  <Text style={styles.specialtyText}>
+                    <Text style={styles.specialtyLabel}>Specialty: </Text>
+                    {tipster.specialty}
+                  </Text>
+                </View>
+              ))
+            )}
+          </View>
+        ) : (
+          /* ========================================================================= */
+          /* 4. DEFAULT HOME CONTENT (When not actively searching) */
+          /* ========================================================================= */
+          <>
+            {/* Top Recommended Tipsters Horizontal Preview */}
+            <View style={styles.topTipstersSection}>
+              <View style={styles.sectionHeader}>
+                <Text style={styles.sectionTitle}>Top Rated Tipsters</Text>
+                <Text style={styles.tipstersCountText}>{ALL_TIPSTERS.length} Verified</Text>
+              </View>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.topTipstersScroll}
+              >
+                {ALL_TIPSTERS.slice(0, 5).map((tipster) => (
+                  <TouchableOpacity
+                    key={tipster.id}
+                    style={styles.tipsterMiniCard}
+                    activeOpacity={0.8}
+                    onPress={() => setSearchQuery(tipster.name)}
+                  >
+                    <View style={[styles.tipsterMiniAvatar, { backgroundColor: tipster.avatarBg }]}>
+                      <Text style={styles.tipsterMiniAvatarText}>
+                        {tipster.name.substring(0, 1)}
+                      </Text>
+                    </View>
+                    <Text style={styles.tipsterMiniName} numberOfLines={1}>
+                      {tipster.name}
+                    </Text>
+                    <View style={styles.miniWinRatePill}>
+                      <Text style={styles.miniWinRateText}>{tipster.winRate.split(' ')[0]}</Text>
+                    </View>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            </View>
+
+            {/* Highlight Banner: Banker of the Day */}
+            <View style={styles.bannerCard}>
+              <View style={styles.bannerInfo}>
+                <View style={styles.tag}>
+                  <Text style={styles.tagText}>TODAY&apos;S HIGHLIGHT</Text>
+                </View>
+                <Text style={styles.bannerTitle}>Banker of the Day</Text>
+                <Text style={styles.bannerOdds}>Odds: 1.85 • 88% Confidence</Text>
+              </View>
+              <Ionicons name="shield-checkmark" size={44} color={colors.secondary} />
+            </View>
+
+            {/* Featured Match Tips Section */}
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Featured Tips</Text>
+              <TouchableOpacity>
+                <Text style={styles.seeAllText}>See all</Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Match tip card 1 */}
+            <View style={styles.tipCard}>
+              <View style={styles.cardHeader}>
+                <Text style={styles.leagueText}>PREMIER LEAGUE • 19:30</Text>
+                <View style={styles.confidenceBadge}>
+                  <Text style={styles.confidenceText}>85% Confidence</Text>
+                </View>
+              </View>
+
+              <View style={styles.matchTeams}>
+                <View style={styles.teamRow}>
+                  <Text style={styles.teamName}>Arsenal</Text>
+                  <Text style={styles.teamOdds}>1.65</Text>
+                </View>
+                <View style={styles.teamRow}>
+                  <Text style={styles.teamName}>Chelsea</Text>
+                  <Text style={styles.teamOdds}>4.20</Text>
+                </View>
+              </View>
+
+              <View style={styles.cardFooter}>
+                <View style={styles.predictionBox}>
+                  <Text style={styles.predictionLabel}>TIP:</Text>
+                  <Text style={styles.predictionValue}>Home Win (1)</Text>
+                </View>
+                <TouchableOpacity
+                  style={[
+                    styles.addToSlipBtn,
+                    addedSlips.includes('match-1') && styles.addToSlipBtnAdded,
+                  ]}
+                  activeOpacity={0.7}
+                  onPress={() => handleToggleAddToSlip('match-1')}
+                >
+                  <Ionicons
+                    name={addedSlips.includes('match-1') ? 'checkmark-circle' : 'add-circle-outline'}
+                    size={17}
+                    color={addedSlips.includes('match-1') ? colors.secondary : colors.textOnPrimary}
+                  />
+                  <Text
+                    style={[
+                      styles.addToSlipText,
+                      addedSlips.includes('match-1') && styles.addToSlipTextAdded,
+                    ]}
+                  >
+                    {addedSlips.includes('match-1') ? 'Added' : 'Add to slip'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            {/* Match tip card 2 */}
+            <View style={styles.tipCard}>
+              <View style={styles.cardHeader}>
+                <Text style={styles.leagueText}>LA LIGA • 21:00</Text>
+                <View style={styles.confidenceBadge}>
+                  <Text style={styles.confidenceText}>80% Confidence</Text>
+                </View>
+              </View>
+
+              <View style={styles.matchTeams}>
+                <View style={styles.teamRow}>
+                  <Text style={styles.teamName}>Real Madrid</Text>
+                  <Text style={styles.teamOdds}>1.52</Text>
+                </View>
+                <View style={styles.teamRow}>
+                  <Text style={styles.teamName}>Barcelona</Text>
+                  <Text style={styles.teamOdds}>2.40</Text>
+                </View>
+              </View>
+
+              <View style={styles.cardFooter}>
+                <View style={styles.predictionBox}>
+                  <Text style={styles.predictionLabel}>TIP:</Text>
+                  <Text style={styles.predictionValue}>Over 2.5 Goals</Text>
+                </View>
+                <TouchableOpacity
+                  style={[
+                    styles.addToSlipBtn,
+                    addedSlips.includes('match-2') && styles.addToSlipBtnAdded,
+                  ]}
+                  activeOpacity={0.7}
+                  onPress={() => handleToggleAddToSlip('match-2')}
+                >
+                  <Ionicons
+                    name={addedSlips.includes('match-2') ? 'checkmark-circle' : 'add-circle-outline'}
+                    size={17}
+                    color={addedSlips.includes('match-2') ? colors.secondary : colors.textOnPrimary}
+                  />
+                  <Text
+                    style={[
+                      styles.addToSlipText,
+                      addedSlips.includes('match-2') && styles.addToSlipTextAdded,
+                    ]}
+                  >
+                    {addedSlips.includes('match-2') ? 'Added' : 'Add to slip'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -120,18 +496,20 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: colors.cardBorder,
+    backgroundColor: colors.background,
   },
   headerSub: {
-    color: colors.secondary,
-    fontSize: 11,
-    fontWeight: '700',
+    color: colors.primary,
+    fontSize: 10,
+    fontWeight: '800',
     letterSpacing: 1,
   },
   headerTitle: {
     color: colors.text,
     fontSize: 22,
-    fontWeight: '800',
+    fontWeight: '900',
     letterSpacing: 0.5,
+    marginTop: 2,
   },
   notificationBtn: {
     width: 40,
@@ -154,18 +532,435 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: 16,
-    paddingBottom: 110,
+    paddingBottom: 115,
+  },
+
+  /* 1. AD BOARD STYLES */
+  adBoardCard: {
+    backgroundColor: colors.card,
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: colors.cardBorder,
+  },
+  adTopBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  sponsoredBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.badgeGoldBg,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: colors.badgeGoldBorder,
+    gap: 4,
+  },
+  sponsoredBadgeText: {
+    color: colors.gold,
+    fontSize: 9,
+    fontWeight: '800',
+    letterSpacing: 0.6,
+  },
+  adControlsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  dotsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  dot: {
+    height: 6,
+    borderRadius: 3,
+  },
+  dotActive: {
+    width: 16,
+    backgroundColor: colors.primary,
+  },
+  dotInactive: {
+    width: 6,
+    backgroundColor: colors.cardBorder,
+  },
+  adContent: {
+    marginBottom: 12,
+  },
+  adCategoryPill: {
+    backgroundColor: colors.badgeGreenBg,
+    alignSelf: 'flex-start',
+    paddingHorizontal: 7,
+    paddingVertical: 3,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: colors.badgeGreenBorder,
+    marginBottom: 6,
+  },
+  adCategoryText: {
+    color: colors.secondary,
+    fontSize: 9,
+    fontWeight: '900',
+    letterSpacing: 0.5,
+  },
+  adTitle: {
+    color: colors.text,
+    fontSize: 17,
+    fontWeight: '800',
+    marginBottom: 4,
+  },
+  adSubtitle: {
+    color: colors.textSecondary,
+    fontSize: 12,
+    lineHeight: 17,
+    marginBottom: 8,
+  },
+  adHighlightBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.cardInner,
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderWidth: 1,
+    borderColor: colors.cardBorder,
+    gap: 6,
+  },
+  adHighlightText: {
+    color: colors.secondary,
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  adFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    borderTopWidth: 1,
+    borderTopColor: colors.cardBorder,
+    paddingTop: 10,
+  },
+  promoCodeBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  promoCodeLabel: {
+    color: colors.textMuted,
+    fontSize: 10,
+    fontWeight: '700',
+  },
+  promoCodeValue: {
+    color: colors.text,
+    fontSize: 12,
+    fontWeight: '900',
+    letterSpacing: 0.8,
+  },
+  adCtaBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.primary,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 8,
+    gap: 6,
+  },
+  adCtaText: {
+    color: colors.textOnPrimary,
+    fontSize: 12,
+    fontWeight: '800',
+  },
+
+  /* 2. SEARCH BAR STYLES */
+  searchSection: {
+    marginBottom: 18,
+  },
+  searchBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.card,
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderWidth: 1,
+    borderColor: colors.cardBorder,
+    gap: 10,
+  },
+  searchInput: {
+    flex: 1,
+    color: colors.text,
+    fontSize: 13,
+    fontWeight: '600',
+    padding: 0,
+  },
+  filterChipsRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginTop: 10,
+  },
+  filterChip: {
+    backgroundColor: colors.card,
+    borderWidth: 1,
+    borderColor: colors.cardBorder,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+  },
+  filterChipActive: {
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
+  },
+  filterChipText: {
+    color: colors.textSecondary,
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  filterChipTextActive: {
+    color: colors.textOnPrimary,
+    fontWeight: '900',
+  },
+
+  /* 3. SEARCH RESULTS STYLES */
+  searchResultsContainer: {
+    marginBottom: 20,
+  },
+  resultsHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+    paddingHorizontal: 2,
+  },
+  resultsHeaderTitle: {
+    color: colors.textMuted,
+    fontSize: 11,
+    fontWeight: '800',
+    letterSpacing: 0.8,
+  },
+  clearSearchText: {
+    color: colors.primary,
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  emptySearchBox: {
+    backgroundColor: colors.card,
+    borderRadius: 14,
+    padding: 24,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: colors.cardBorder,
+    marginTop: 8,
+  },
+  emptySearchTitle: {
+    color: colors.text,
+    fontSize: 15,
+    fontWeight: '800',
+    marginTop: 10,
+  },
+  emptySearchSub: {
+    color: colors.textSecondary,
+    fontSize: 12,
+    textAlign: 'center',
+    marginTop: 4,
+    lineHeight: 18,
+  },
+  tipsterResultCard: {
+    backgroundColor: colors.card,
+    borderRadius: 14,
+    padding: 14,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: colors.cardBorder,
+  },
+  tipsterCardTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  tipsterProfileGroup: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  tipsterAvatar: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  tipsterAvatarText: {
+    color: '#FFFFFF',
+    fontSize: 15,
+    fontWeight: '800',
+  },
+  tipsterNameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  tipsterName: {
+    color: colors.text,
+    fontSize: 14,
+    fontWeight: '800',
+  },
+  tipsterHandle: {
+    color: colors.textMuted,
+    fontSize: 11,
+  },
+  tipsterFollowBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.primary,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+    gap: 4,
+  },
+  tipsterFollowBtnActive: {
+    backgroundColor: colors.cardInner,
+    borderWidth: 1,
+    borderColor: colors.secondary,
+  },
+  tipsterFollowText: {
+    color: colors.textOnPrimary,
+    fontSize: 11,
+    fontWeight: '800',
+  },
+  tipsterFollowTextActive: {
+    color: colors.secondary,
+    fontWeight: '700',
+  },
+  tipsterMetricsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 8,
+    flexWrap: 'wrap',
+  },
+  winRateBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: colors.badgeGreenBg,
+    paddingHorizontal: 7,
+    paddingVertical: 3,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: colors.badgeGreenBorder,
+  },
+  winRateText: {
+    color: colors.secondary,
+    fontSize: 10,
+    fontWeight: '800',
+  },
+  streakBadge: {
+    backgroundColor: colors.badgeGoldBg,
+    paddingHorizontal: 7,
+    paddingVertical: 3,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: colors.badgeGoldBorder,
+  },
+  streakText: {
+    color: colors.gold,
+    fontSize: 10,
+    fontWeight: '800',
+  },
+  slipsBadge: {
+    backgroundColor: colors.cardInner,
+    paddingHorizontal: 7,
+    paddingVertical: 3,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: colors.cardBorder,
+  },
+  slipsBadgeText: {
+    color: colors.textSecondary,
+    fontSize: 10,
+    fontWeight: '600',
+  },
+  specialtyText: {
+    color: colors.textSecondary,
+    fontSize: 11,
+    lineHeight: 16,
+  },
+  specialtyLabel: {
+    color: colors.textMuted,
+    fontWeight: '700',
+  },
+
+  /* 4. DEFAULT CONTENT STYLES */
+  topTipstersSection: {
+    marginBottom: 18,
+  },
+  topTipstersScroll: {
+    gap: 12,
+    paddingVertical: 4,
+  },
+  tipstersCountText: {
+    color: colors.secondary,
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  tipsterMiniCard: {
+    alignItems: 'center',
+    backgroundColor: colors.card,
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderWidth: 1,
+    borderColor: colors.cardBorder,
+    width: 82,
+  },
+  tipsterMiniAvatar: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 6,
+  },
+  tipsterMiniAvatarText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '800',
+  },
+  tipsterMiniName: {
+    color: colors.text,
+    fontSize: 11,
+    fontWeight: '700',
+    textAlign: 'center',
+    marginBottom: 4,
+  },
+  miniWinRatePill: {
+    backgroundColor: colors.badgeGreenBg,
+    paddingHorizontal: 5,
+    paddingVertical: 2,
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: colors.badgeGreenBorder,
+  },
+  miniWinRateText: {
+    color: colors.secondary,
+    fontSize: 9,
+    fontWeight: '900',
   },
   bannerCard: {
     backgroundColor: colors.card,
     borderRadius: 16,
-    padding: 18,
+    padding: 16,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     borderWidth: 1,
     borderColor: colors.cardBorder,
-    marginBottom: 20,
+    marginBottom: 18,
   },
   bannerInfo: {
     flex: 1,
@@ -187,35 +982,35 @@ const styles = StyleSheet.create({
   },
   bannerTitle: {
     color: colors.text,
-    fontSize: 18,
-    fontWeight: '700',
+    fontSize: 17,
+    fontWeight: '800',
   },
   bannerOdds: {
     color: colors.textSecondary,
-    fontSize: 13,
+    fontSize: 12,
     marginTop: 4,
   },
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 10,
   },
   sectionTitle: {
     color: colors.text,
-    fontSize: 18,
-    fontWeight: '700',
+    fontSize: 16,
+    fontWeight: '800',
   },
   seeAllText: {
-    color: colors.secondary,
-    fontSize: 13,
-    fontWeight: '600',
+    color: colors.primary,
+    fontSize: 12,
+    fontWeight: '700',
   },
   tipCard: {
     backgroundColor: colors.card,
     borderRadius: 14,
     padding: 16,
-    marginBottom: 14,
+    marginBottom: 12,
     borderWidth: 1,
     borderColor: colors.cardBorder,
   },
@@ -223,7 +1018,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 10,
   },
   leagueText: {
     color: colors.textSecondary,
@@ -244,22 +1039,23 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   matchTeams: {
-    marginBottom: 12,
+    marginBottom: 10,
   },
   teamRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingVertical: 4,
+    alignItems: 'center',
+    paddingVertical: 2,
   },
   teamName: {
     color: colors.text,
-    fontSize: 15,
-    fontWeight: '600',
-  },
-  teamOdds: {
-    color: colors.textSecondary,
     fontSize: 14,
     fontWeight: '700',
+  },
+  teamOdds: {
+    color: colors.secondary,
+    fontSize: 14,
+    fontWeight: '800',
   },
   cardFooter: {
     flexDirection: 'row',
@@ -276,12 +1072,12 @@ const styles = StyleSheet.create({
   },
   predictionLabel: {
     color: colors.textMuted,
-    fontSize: 12,
-    fontWeight: '700',
+    fontSize: 11,
+    fontWeight: '800',
   },
   predictionValue: {
     color: colors.secondary,
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '700',
   },
   addToSlipBtn: {
@@ -293,9 +1089,18 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     gap: 4,
   },
+  addToSlipBtnAdded: {
+    backgroundColor: colors.cardInner,
+    borderWidth: 1,
+    borderColor: colors.secondary,
+  },
   addToSlipText: {
     color: colors.textOnPrimary,
     fontSize: 12,
+    fontWeight: '800',
+  },
+  addToSlipTextAdded: {
+    color: colors.secondary,
     fontWeight: '700',
   },
 });
