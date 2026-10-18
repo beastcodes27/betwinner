@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   View,
   Text,
+  Image,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
@@ -14,8 +15,14 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '@/constants/theme';
-import { HOME_ADS, ALL_TIPSTERS, FollowedTipster } from '@/data/mockSlips';
+import {
+  HOME_ADS,
+  ALL_TIPSTERS,
+  FollowedTipster,
+  FEATURED_MATCH,
+} from '@/data/mockSlips';
 import { useAppUI } from '@/context/UIContext';
+import BookmakerLogo from '@/components/BookmakerLogo';
 
 type TipsterFilterChip = 'all' | 'high_win' | 'top_rated' | 'vip';
 
@@ -292,8 +299,17 @@ export default function HomeScreen() {
                 <View key={ad.id} style={{ width: bannerWidth }}>
                   {/* Ad Body */}
                   <View style={styles.adContent}>
-                    <View style={styles.adCategoryPill}>
-                      <Text style={styles.adCategoryText}>{ad.badge}</Text>
+                    <View style={styles.adBadgeRow}>
+                      <View style={styles.adCategoryPill}>
+                        <Text style={styles.adCategoryText}>{ad.badge}</Text>
+                      </View>
+                      {ad.bookmaker && (
+                        <BookmakerLogo
+                          name={ad.bookmaker}
+                          source={ad.bookmakerLogo}
+                          size="xs"
+                        />
+                      )}
                     </View>
                     <Text style={styles.adTitle}>{ad.title}</Text>
                     <Text style={styles.adSubtitle}>{ad.subtitle}</Text>
@@ -566,38 +582,72 @@ export default function HomeScreen() {
                   <Ionicons name="flame" size={13} color={colors.gold} />
                   <Text style={styles.topGameBadgeText}>TOP GAME OF THE DAY</Text>
                 </View>
-                <View style={styles.topGameLiveTag}>
-                  <View style={styles.livePulseDot} />
-                  <Text style={styles.topGameLiveText}>LIVE POLL</Text>
+                <View style={styles.topGameHeaderRight}>
+                  {FEATURED_MATCH.bookmaker && (
+                    <BookmakerLogo
+                      name={FEATURED_MATCH.bookmaker}
+                      source={FEATURED_MATCH.bookmakerLogo}
+                      size="xs"
+                    />
+                  )}
+                  <View style={styles.topGameLiveTag}>
+                    <View style={styles.livePulseDot} />
+                    <Text style={styles.topGameLiveText}>LIVE POLL</Text>
+                  </View>
                 </View>
               </View>
 
               {/* League & Time */}
-              <Text style={styles.topGameLeague}>UEFA CHAMPIONS LEAGUE • TONIGHT 22:00</Text>
+              <View style={styles.topGameLeagueRow}>
+                {FEATURED_MATCH.leagueLogo && (
+                  <Image
+                    source={FEATURED_MATCH.leagueLogo}
+                    style={styles.leagueLogoImg}
+                    resizeMode="contain"
+                  />
+                )}
+                <Text style={styles.topGameLeague}>{FEATURED_MATCH.league}</Text>
+              </View>
 
               {/* Teams Matchup Showcase */}
               <View style={styles.topGameVersusContainer}>
                 <View style={styles.topGameTeam}>
-                  <View style={[styles.teamEmblem, { backgroundColor: '#B91C1C' }]}>
-                    <Text style={styles.teamEmblemText}>ARS</Text>
-                  </View>
-                  <Text style={styles.topGameTeamName}>Arsenal</Text>
-                  <Text style={styles.topGameForm}>Form: W-W-W-D</Text>
+                  {FEATURED_MATCH.homeTeam.logo ? (
+                    <Image
+                      source={FEATURED_MATCH.homeTeam.logo}
+                      style={styles.teamLogoImg}
+                      resizeMode="contain"
+                    />
+                  ) : (
+                    <View style={[styles.teamEmblem, { backgroundColor: '#B91C1C' }]}>
+                      <Text style={styles.teamEmblemText}>ARS</Text>
+                    </View>
+                  )}
+                  <Text style={styles.topGameTeamName}>{FEATURED_MATCH.homeTeam.name}</Text>
+                  <Text style={styles.topGameForm}>{FEATURED_MATCH.homeTeam.form}</Text>
                 </View>
 
                 <View style={styles.vsCenterBox}>
                   <View style={styles.vsCircle}>
                     <Text style={styles.vsText}>VS</Text>
                   </View>
-                  <Text style={styles.topGameVenue}>Emirates Stadium</Text>
+                  <Text style={styles.topGameVenue}>{FEATURED_MATCH.venue}</Text>
                 </View>
 
                 <View style={styles.topGameTeam}>
-                  <View style={[styles.teamEmblem, { backgroundColor: '#1D4ED8' }]}>
-                    <Text style={styles.teamEmblemText}>CHE</Text>
-                  </View>
-                  <Text style={styles.topGameTeamName}>Chelsea</Text>
-                  <Text style={styles.topGameForm}>Form: W-W-D-W</Text>
+                  {FEATURED_MATCH.awayTeam.logo ? (
+                    <Image
+                      source={FEATURED_MATCH.awayTeam.logo}
+                      style={styles.teamLogoImg}
+                      resizeMode="contain"
+                    />
+                  ) : (
+                    <View style={[styles.teamEmblem, { backgroundColor: '#1D4ED8' }]}>
+                      <Text style={styles.teamEmblemText}>CHE</Text>
+                    </View>
+                  )}
+                  <Text style={styles.topGameTeamName}>{FEATURED_MATCH.awayTeam.name}</Text>
+                  <Text style={styles.topGameForm}>{FEATURED_MATCH.awayTeam.form}</Text>
                 </View>
               </View>
 
@@ -885,6 +935,12 @@ const styles = StyleSheet.create({
   },
   adContent: {
     marginBottom: 12,
+  },
+  adBadgeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 6,
   },
   adCategoryPill: {
     backgroundColor: colors.badgeGreenBg,
@@ -1393,12 +1449,32 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     letterSpacing: 0.6,
   },
+  topGameHeaderRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  topGameLeagueRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 12,
+  },
+  leagueLogoImg: {
+    width: 78,
+    height: 20,
+    borderRadius: 4,
+  },
+  teamLogoImg: {
+    width: 44,
+    height: 44,
+    marginBottom: 6,
+  },
   topGameLeague: {
     color: colors.textSecondary,
     fontSize: 10,
     fontWeight: '800',
     letterSpacing: 0.8,
-    marginBottom: 12,
   },
   topGameVersusContainer: {
     flexDirection: 'row',

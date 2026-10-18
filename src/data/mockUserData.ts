@@ -1,4 +1,4 @@
-import { MatchSelection } from './mockSlips';
+import { MatchSelection, BOOKMAKER_LOGOS } from './mockSlips';
 
 export interface PurchasedSlip {
   id: string;
@@ -8,6 +8,7 @@ export interface PurchasedSlip {
   tipsterHandle: string;
   tipsterAvatarBg: string;
   bookmaker: string;
+  bookmakerLogo?: any;
   bookingCode: string;
   totalOdds: number;
   matchesCount: number;
@@ -46,6 +47,7 @@ export const MOCK_PURCHASED_SLIPS: PurchasedSlip[] = [
     tipsterHandle: '@betmaster_ke',
     tipsterAvatarBg: '#10B981',
     bookmaker: 'SportyBet',
+    bookmakerLogo: BOOKMAKER_LOGOS.sportybet,
     bookingCode: 'SPY-77192',
     totalOdds: 14.25,
     matchesCount: 6,
@@ -118,6 +120,7 @@ export const MOCK_PURCHASED_SLIPS: PurchasedSlip[] = [
     tipsterHandle: '@kingdraws',
     tipsterAvatarBg: '#F59E0B',
     bookmaker: 'Betika',
+    bookmakerLogo: BOOKMAKER_LOGOS.betika,
     bookingCode: 'BTK-55201',
     totalOdds: 28.5,
     matchesCount: 3,
@@ -163,6 +166,7 @@ export const MOCK_PURCHASED_SLIPS: PurchasedSlip[] = [
     tipsterHandle: '@goal_hunter',
     tipsterAvatarBg: '#8B5CF6',
     bookmaker: '1xBet',
+    bookmakerLogo: BOOKMAKER_LOGOS['1xbet'],
     bookingCode: '1XB-88319',
     totalOdds: 8.75,
     matchesCount: 5,
@@ -225,8 +229,9 @@ export const MOCK_PURCHASED_SLIPS: PurchasedSlip[] = [
     tipsterName: 'Stats Wizard',
     tipsterHandle: '@statswiz',
     tipsterAvatarBg: '#EC4899',
-    bookmaker: 'Betika',
-    bookingCode: 'BTK-11938',
+    bookmaker: 'MozzartBet',
+    bookmakerLogo: BOOKMAKER_LOGOS.mozzartbet,
+    bookingCode: 'MOZ-11938',
     totalOdds: 6.4,
     matchesCount: 4,
     purchaseDate: '11 Oct 2026, 09:30 AM',
@@ -269,6 +274,52 @@ export const MOCK_PURCHASED_SLIPS: PurchasedSlip[] = [
         pick: 'Arsenal Over 1.5 Goals',
         odds: 1.62,
         confidence: 87,
+      },
+    ],
+  },
+  {
+    id: 'purchased-5',
+    slipId: 'slip-past-3',
+    title: 'Weekend Betway Elite Value Treble',
+    tipsterName: 'Tactical Draw Pro',
+    tipsterHandle: '@draw_tactics',
+    tipsterAvatarBg: '#10B981',
+    bookmaker: 'Betway',
+    bookmakerLogo: BOOKMAKER_LOGOS.betway,
+    bookingCode: 'BTW-30948',
+    totalOdds: 8.85,
+    matchesCount: 3,
+    purchaseDate: 'Today, 08:15 AM',
+    amountPaid: 'Tshs 1,000',
+    status: 'active',
+    validUntil: 'Valid for 4h 15m',
+    selections: [
+      {
+        id: 'ps5-1',
+        match: 'Juventus vs Lazio',
+        league: 'Serie A',
+        kickoff: 'Today 21:45',
+        pick: 'Juventus to Win & Under 3.5 Goals',
+        odds: 2.10,
+        confidence: 83,
+      },
+      {
+        id: 'ps5-2',
+        match: 'Sevilla vs Real Sociedad',
+        league: 'La Liga',
+        kickoff: 'Today 20:00',
+        pick: 'Draw at Half Time (X HT)',
+        odds: 2.05,
+        confidence: 79,
+      },
+      {
+        id: 'ps5-3',
+        match: 'Frankfurt vs Stuttgart',
+        league: 'Bundesliga',
+        kickoff: 'Today 19:30',
+        pick: 'Both Teams to Score (BTTS)',
+        odds: 1.55,
+        confidence: 88,
       },
     ],
   },

@@ -1,3 +1,22 @@
+export const BOOKMAKER_LOGOS = {
+  betika: require('../../assets/logos/betika.png'),
+  sportybet: require('../../assets/logos/sportybet.png'),
+  '1xbet': require('../../assets/logos/1xbet.png'),
+  mozzartbet: require('../../assets/logos/mozzartbet.png'),
+  mozzart: require('../../assets/logos/mozzartbet.png'),
+  betway: require('../../assets/logos/betway.png'),
+} as const;
+
+export const TEAM_LOGOS = {
+  arsenal: require('../../assets/teams/arsenal.png'),
+  chelsea: require('../../assets/teams/chelsea.png'),
+} as const;
+
+export const LEAGUE_LOGOS = {
+  ucl: require('../../assets/leagues/ucl.png'),
+  epl: require('../../assets/leagues/epl.png'),
+} as const;
+
 export interface MatchSelection {
   id: string;
   match: string;
@@ -30,6 +49,7 @@ export interface TipsterSlip {
   isFree: boolean;
   confidence: number;
   bookmaker: string;
+  bookmakerLogo?: any;
   bookingCode: string;
   selections: MatchSelection[];
 }
@@ -55,6 +75,7 @@ export const MOCK_SLIPS: TipsterSlip[] = [
     isFree: true,
     confidence: 89,
     bookmaker: 'Betika',
+    bookmakerLogo: BOOKMAKER_LOGOS.betika,
     bookingCode: 'BTK-94821',
     selections: [
       {
@@ -115,6 +136,7 @@ export const MOCK_SLIPS: TipsterSlip[] = [
     isFree: false,
     confidence: 76,
     bookmaker: 'SportyBet',
+    bookmakerLogo: BOOKMAKER_LOGOS.sportybet,
     bookingCode: 'SB-38194',
     selections: [
       {
@@ -183,8 +205,9 @@ export const MOCK_SLIPS: TipsterSlip[] = [
     amount: 'Free',
     isFree: true,
     confidence: 93,
-    bookmaker: 'Betika',
-    bookingCode: 'BTK-11209',
+    bookmaker: 'MozzartBet',
+    bookmakerLogo: BOOKMAKER_LOGOS.mozzartbet,
+    bookingCode: 'MOZ-11209',
     selections: [
       {
         id: 's3-1',
@@ -226,6 +249,7 @@ export const MOCK_SLIPS: TipsterSlip[] = [
     isFree: false,
     confidence: 72,
     bookmaker: '1xBet',
+    bookmakerLogo: BOOKMAKER_LOGOS['1xbet'],
     bookingCode: '1X-88741',
     selections: [
       {
@@ -281,6 +305,58 @@ export const MOCK_SLIPS: TipsterSlip[] = [
         pick: 'Celtic to Win (1)',
         odds: 1.95,
         confidence: 75,
+      },
+    ],
+  },
+  {
+    id: 'slip-5',
+    tipster: {
+      name: 'Tactical Draw Pro',
+      handle: '@draw_tactics',
+      avatarBg: '#10B981',
+      winRate: '75% Win Rate',
+      badge: 'DRAW SPECIALIST 🎯',
+      followers: '14.3k',
+      verified: true,
+    },
+    title: 'Weekend Betway Value Treble',
+    category: 'High Odds',
+    totalOdds: 8.85,
+    matchesCount: 3,
+    validityTime: 'Valid for 4h 15m',
+    amount: 'Tshs 1,000',
+    isFree: false,
+    confidence: 81,
+    bookmaker: 'Betway',
+    bookmakerLogo: BOOKMAKER_LOGOS.betway,
+    bookingCode: 'BTW-30948',
+    selections: [
+      {
+        id: 's5-1',
+        match: 'Juventus vs Lazio',
+        league: 'Serie A',
+        kickoff: 'Today 21:45',
+        pick: 'Juventus to Win & Under 3.5 Goals',
+        odds: 2.10,
+        confidence: 83,
+      },
+      {
+        id: 's5-2',
+        match: 'Sevilla vs Real Sociedad',
+        league: 'La Liga',
+        kickoff: 'Today 20:00',
+        pick: 'Draw at Half Time (X HT)',
+        odds: 2.05,
+        confidence: 79,
+      },
+      {
+        id: 's5-3',
+        match: 'Frankfurt vs Stuttgart',
+        league: 'Bundesliga',
+        kickoff: 'Today 19:30',
+        pick: 'Both Teams to Score (BTTS)',
+        odds: 1.55,
+        confidence: 88,
       },
     ],
   },
@@ -393,12 +469,16 @@ export interface HomeAd {
   highlight: string;
   ctaText: string;
   promoCode?: string;
+  bookmaker?: string;
+  bookmakerLogo?: any;
 }
 
 export const HOME_ADS: HomeAd[] = [
   {
     id: 'ad-1',
     badge: 'BETIKA MIDWEEK JACKPOT',
+    bookmaker: 'Betika',
+    bookmakerLogo: BOOKMAKER_LOGOS.betika,
     title: 'Tshs 15,000,000 Super Jackpot',
     subtitle: '15 matches analyzed by VIP tipsters with full 1X2 combinations & form guides.',
     highlight: 'Tshs 1,000 Stake • 100% Free First Slip',
@@ -407,7 +487,9 @@ export const HOME_ADS: HomeAd[] = [
   },
   {
     id: 'ad-2',
-    badge: 'M-PESA CASHBACK PROMO',
+    badge: 'SPORTYBET CASHBACK PROMO',
+    bookmaker: 'SportyBet',
+    bookmakerLogo: BOOKMAKER_LOGOS.sportybet,
     title: '50% Instant Cashback on All Slips',
     subtitle: 'Top up your wallet or purchase any premium tipster slip and receive instant M-Pesa rebate.',
     highlight: 'No minimum deposit • Auto-credited',
@@ -416,14 +498,87 @@ export const HOME_ADS: HomeAd[] = [
   },
   {
     id: 'ad-3',
-    badge: 'VIP CLUB PASS',
+    badge: 'MOZZARTBET VIP PASS',
+    bookmaker: 'MozzartBet',
+    bookmakerLogo: BOOKMAKER_LOGOS.mozzartbet,
     title: 'Join Elite 90%+ Win Rate Channel',
-    subtitle: 'Get daily morning banker slips directly with Betika & SportyBet booking codes.',
+    subtitle: 'Get daily morning banker slips directly with MozzartBet & Betika booking codes.',
     highlight: 'Limited spots • Weekend VIP access',
     ctaText: 'Claim VIP Pass',
     promoCode: 'ELITEVIP',
   },
+  {
+    id: 'ad-4',
+    badge: 'BETWAY BOOST SPECIAL',
+    bookmaker: 'Betway',
+    bookmakerLogo: BOOKMAKER_LOGOS.betway,
+    title: 'Weekend 100% Multi-Bet Cash Boost',
+    subtitle: 'Build an accumulator of 5+ games and get your payouts boosted up to 100% on Betway.',
+    highlight: 'Tshs 500 Min Stake • Live In-Play Payouts',
+    ctaText: 'Claim Betway Boost',
+    promoCode: 'BETWAY100',
+  },
 ];
+
+export interface FeaturedMatch {
+  id: string;
+  league: string;
+  leagueLogo?: any;
+  kickoff: string;
+  venue: string;
+  bookmaker: string;
+  bookmakerLogo?: any;
+  homeTeam: {
+    name: string;
+    code: string;
+    logo?: any;
+    color: string;
+    form: string;
+    odds: number;
+  };
+  awayTeam: {
+    name: string;
+    code: string;
+    logo?: any;
+    color: string;
+    form: string;
+    odds: number;
+  };
+  draw: {
+    odds: number;
+  };
+  tipsterConsensus: string;
+}
+
+export const FEATURED_MATCH: FeaturedMatch = {
+  id: 'featured-ucl-1',
+  league: 'UEFA CHAMPIONS LEAGUE • TONIGHT 22:00',
+  leagueLogo: LEAGUE_LOGOS.ucl,
+  kickoff: 'Tonight 22:00',
+  venue: 'Emirates Stadium',
+  bookmaker: 'Betika',
+  bookmakerLogo: BOOKMAKER_LOGOS.betika,
+  homeTeam: {
+    name: 'Arsenal',
+    code: 'ARS',
+    logo: TEAM_LOGOS.arsenal,
+    color: '#B91C1C',
+    form: 'Form: W-W-W-D',
+    odds: 1.95,
+  },
+  awayTeam: {
+    name: 'Chelsea',
+    code: 'CHE',
+    logo: TEAM_LOGOS.chelsea,
+    color: '#1D4ED8',
+    form: 'Form: W-W-D-W',
+    odds: 3.40,
+  },
+  draw: {
+    odds: 3.25,
+  },
+  tipsterConsensus: '74% Predict Arsenal Win (1)',
+};
 
 export const ALL_TIPSTERS: FollowedTipster[] = [
   ...FOLLOWED_TIPSTERS,

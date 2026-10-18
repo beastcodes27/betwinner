@@ -11,7 +11,8 @@ import {
 import { colors } from '@/constants/theme';
 
 export interface BookmakerLogoProps {
-  name: string;
+  name?: string;
+  source?: ImageSourcePropType;
   size?: 'xs' | 'sm' | 'md' | 'lg';
   style?: StyleProp<ViewStyle>;
 }
@@ -32,9 +33,9 @@ const SIZE_MAP = {
   lg: { width: 118, height: 31 },
 };
 
-export default function BookmakerLogo({ name, size = 'sm', style }: BookmakerLogoProps) {
+export default function BookmakerLogo({ name = '', source, size = 'sm', style }: BookmakerLogoProps) {
   const normalizedKey = (name || '').trim().toLowerCase().replace(/[\s-_]/g, '');
-  const assetSource = BOOKMAKER_ASSETS[normalizedKey];
+  const assetSource = source || BOOKMAKER_ASSETS[normalizedKey];
   const dimensions = SIZE_MAP[size];
 
   if (assetSource) {
@@ -115,3 +116,4 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
 });
+

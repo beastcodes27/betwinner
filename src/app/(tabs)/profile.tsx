@@ -435,7 +435,7 @@ export default function ProfileScreen() {
 
                 {/* Bookmaker & Booking Code Pill */}
                 <View style={styles.codeRowSection}>
-                  <BookmakerLogo name={slip.bookmaker} size="sm" />
+                  <BookmakerLogo name={slip.bookmaker} source={slip.bookmakerLogo} size="sm" />
                   <TouchableOpacity
                     style={[
                       styles.codePill,

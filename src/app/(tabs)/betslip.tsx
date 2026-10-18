@@ -293,7 +293,7 @@ export default function BetslipScreen() {
                     onPress={() => setActiveSlip(slip)}
                     activeOpacity={0.7}
                   >
-                    <BookmakerLogo name={slip.bookmaker} size="sm" />
+                    <BookmakerLogo name={slip.bookmaker} source={slip.bookmakerLogo} size="sm" />
                     <View style={styles.codeRow}>
                       {unlocked ? (
                         <>
@@ -517,7 +517,7 @@ export default function BetslipScreen() {
                       <View style={styles.codeInfo}>
                         <View style={styles.modalBookmakerRow}>
                           <Text style={styles.codeLabel}>BOOKING CODE</Text>
-                          <BookmakerLogo name={activeSlip.bookmaker} size="sm" />
+                          <BookmakerLogo name={activeSlip.bookmaker} source={activeSlip.bookmakerLogo} size="sm" />
                         </View>
                         <Text style={styles.codeValue}>{activeSlip.bookingCode}</Text>
                       </View>
@@ -544,7 +544,7 @@ export default function BetslipScreen() {
                       <View style={styles.codeInfo}>
                         <View style={styles.modalBookmakerRow}>
                           <Text style={styles.codeLabel}>BOOKING CODE</Text>
-                          <BookmakerLogo name={activeSlip.bookmaker} size="sm" />
+                          <BookmakerLogo name={activeSlip.bookmaker} source={activeSlip.bookmakerLogo} size="sm" />
                         </View>
                         <Text style={styles.codeValueLocked}>•••••••• (VIP Subscription)</Text>
                       </View>

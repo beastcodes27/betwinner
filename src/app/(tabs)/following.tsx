@@ -207,7 +207,7 @@ export default function FollowingScreen() {
                       {tipster.latestSlip.title}
                     </Text>
                     <View style={styles.slipSubInfoRow}>
-                      <BookmakerLogo name={tipster.latestSlip.bookmaker} size="xs" />
+                      <BookmakerLogo name={tipster.latestSlip.bookmaker} source={tipster.latestSlip.bookmakerLogo} size="xs" />
                       <Text style={styles.slipSubInfoDot}>•</Text>
                       <Text style={styles.slipSubInfo}>
                         {tipster.latestSlip.matchesCount} Matches • {tipster.latestSlip.amount}
@@ -313,7 +313,7 @@ export default function FollowingScreen() {
               <View style={styles.codeInfo}>
                 <View style={styles.modalBookmakerRow}>
                   <Text style={styles.codeLabel}>BOOKING CODE</Text>
-                  {activeSlip && <BookmakerLogo name={activeSlip.bookmaker} size="sm" />}
+                  {activeSlip && <BookmakerLogo name={activeSlip.bookmaker} source={activeSlip.bookmakerLogo} size="sm" />}
                 </View>
                 <Text style={styles.codeValue}>{activeSlip?.bookingCode}</Text>
               </View>
