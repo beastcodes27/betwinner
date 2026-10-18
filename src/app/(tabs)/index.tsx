@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   View,
   Text,
@@ -6,6 +6,10 @@ import {
   ScrollView,
   TouchableOpacity,
   TextInput,
+  useWindowDimensions,
+  NativeSyntheticEvent,
+  NativeScrollEvent,
+  LayoutChangeEvent,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -56,14 +60,90 @@ export default function HomeScreen() {
   const pctX = Math.round((voteCounts['X'] / totalVotes) * 100);
   const pct2 = 100 - pct1 - pctX;
 
-  const currentAd = HOME_ADS[currentAdIndex];
+  // Auto-scrolling Ads Board Setup (3-second interval)
+  const { width: windowWidth } = useWindowDimensions();
+  // Available carousel slide width: windowWidth minus screen horizontal padding (16*2) minus card padding (16*2)
+  const [bannerWidth, setBannerWidth] = useState(windowWidth > 64 ? windowWidth - 64 : 320);
+  const adScrollRef = useRef<ScrollView>(null);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const startAutoScroll = useCallback(() => {
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+    }
+    if (HOME_ADS.length <= 1 || bannerWidth <= 0) return;
+
+    timerRef.current = setInterval(() => {
+      setCurrentAdIndex((prevIndex) => {
+        const nextIndex = (prevIndex + 1) % HOME_ADS.length;
+        adScrollRef.current?.scrollTo({
+          x: nextIndex * bannerWidth,
+          animated: true,
+        });
+        return nextIndex;
+      });
+    }, 3000);
+  }, [bannerWidth]);
+
+  useEffect(() => {
+    startAutoScroll();
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    };
+  }, [startAutoScroll]);
 
   const handleNextAd = () => {
-    setCurrentAdIndex((prev) => (prev + 1) % HOME_ADS.length);
+    const nextIndex = (currentAdIndex + 1) % HOME_ADS.length;
+    setCurrentAdIndex(nextIndex);
+    adScrollRef.current?.scrollTo({
+      x: nextIndex * bannerWidth,
+      animated: true,
+    });
+    startAutoScroll();
   };
 
   const handlePrevAd = () => {
-    setCurrentAdIndex((prev) => (prev - 1 + HOME_ADS.length) % HOME_ADS.length);
+    const prevIndex = (currentAdIndex - 1 + HOME_ADS.length) % HOME_ADS.length;
+    setCurrentAdIndex(prevIndex);
+    adScrollRef.current?.scrollTo({
+      x: prevIndex * bannerWidth,
+      animated: true,
+    });
+    startAutoScroll();
+  };
+
+  const handleGoToAd = (idx: number) => {
+    setCurrentAdIndex(idx);
+    adScrollRef.current?.scrollTo({
+      x: idx * bannerWidth,
+      animated: true,
+    });
+    startAutoScroll();
+  };
+
+  const handleScrollBeginDrag = () => {
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+    }
+  };
+
+  const handleMomentumScrollEnd = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    if (bannerWidth <= 0) return;
+    const offsetX = e.nativeEvent.contentOffset.x;
+    const newIndex = Math.round(offsetX / bannerWidth);
+    if (newIndex >= 0 && newIndex < HOME_ADS.length) {
+      setCurrentAdIndex(newIndex);
+    }
+    startAutoScroll();
+  };
+
+  const handleContainerLayout = (e: LayoutChangeEvent) => {
+    const measured = e.nativeEvent.layout.width;
+    if (measured > 0 && Math.abs(measured - bannerWidth) > 1) {
+      setBannerWidth(measured);
+    }
   };
 
   const handleToggleFollow = (id: string) => {
@@ -159,21 +239,30 @@ export default function HomeScreen() {
         <View style={styles.adBoardCard}>
           {/* Ad Card Header */}
           <View style={styles.adTopBar}>
-            <View style={styles.sponsoredBadge}>
-              <Ionicons name="megaphone" size={12} color={colors.gold} />
-              <Text style={styles.sponsoredBadgeText}>SPONSORED PROMO</Text>
+            <View style={styles.sponsoredBadgeRow}>
+              <View style={styles.sponsoredBadge}>
+                <Ionicons name="megaphone" size={12} color={colors.gold} />
+                <Text style={styles.sponsoredBadgeText}>SPONSORED PROMO</Text>
+              </View>
+              <View style={styles.autoPill}>
+                <Ionicons name="sync" size={9} color={colors.gold} />
+                <Text style={styles.autoPillText}>3s</Text>
+              </View>
             </View>
 
             {/* Slide Indicators & Controls */}
             <View style={styles.adControlsRow}>
-              <TouchableOpacity onPress={handlePrevAd} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+              <TouchableOpacity
+                onPress={handlePrevAd}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              >
                 <Ionicons name="chevron-back" size={16} color={colors.textSecondary} />
               </TouchableOpacity>
               <View style={styles.dotsRow}>
                 {HOME_ADS.map((ad, idx) => (
                   <TouchableOpacity
                     key={ad.id}
-                    onPress={() => setCurrentAdIndex(idx)}
+                    onPress={() => handleGoToAd(idx)}
                     style={[
                       styles.dot,
                       currentAdIndex === idx ? styles.dotActive : styles.dotInactive,
@@ -181,59 +270,83 @@ export default function HomeScreen() {
                   />
                 ))}
               </View>
-              <TouchableOpacity onPress={handleNextAd} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+              <TouchableOpacity
+                onPress={handleNextAd}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              >
                 <Ionicons name="chevron-forward" size={16} color={colors.textSecondary} />
               </TouchableOpacity>
             </View>
           </View>
 
-          {/* Ad Body */}
-          <View style={styles.adContent}>
-            <View style={styles.adCategoryPill}>
-              <Text style={styles.adCategoryText}>{currentAd.badge}</Text>
-            </View>
-            <Text style={styles.adTitle}>{currentAd.title}</Text>
-            <Text style={styles.adSubtitle}>{currentAd.subtitle}</Text>
-
-            {/* Ad Highlight Box */}
-            <View style={styles.adHighlightBox}>
-              <Ionicons name="sparkles" size={14} color={colors.secondary} />
-              <Text style={styles.adHighlightText}>{currentAd.highlight}</Text>
-            </View>
-          </View>
-
-          {/* Ad Footer & CTA */}
-          <View style={styles.adFooter}>
-            {currentAd.promoCode && (
-              <View style={styles.promoCodeBox}>
-                <Text style={styles.promoCodeLabel}>CODE:</Text>
-                <Text style={styles.promoCodeValue}>{currentAd.promoCode}</Text>
-              </View>
-            )}
-            <TouchableOpacity
-              style={styles.adCtaBtn}
-              activeOpacity={0.8}
-              onPress={() =>
-                showPopup({
-                  type: 'success',
-                  icon: 'sparkles',
-                  title: currentAd.title,
-                  message: `${currentAd.subtitle}\n\nPromo code ${currentAd.promoCode || 'AUTOMATIC'} has been credited to your BetWinner wallet!`,
-                  primaryText: 'Claim Bonus',
-                  secondaryText: 'Close',
-                  onConfirm: () => {
-                    showToast({
-                      type: 'success',
-                      title: 'Promo Claimed Successfully!',
-                      message: `${currentAd.badge} bonus active on your next betslip purchase.`,
-                    });
-                  },
-                })
-              }
+          {/* Horizontal Auto-scrolling Carousel Container */}
+          <View style={styles.carouselContainer} onLayout={handleContainerLayout}>
+            <ScrollView
+              ref={adScrollRef}
+              horizontal
+              pagingEnabled
+              snapToInterval={bannerWidth}
+              snapToAlignment="start"
+              decelerationRate="fast"
+              showsHorizontalScrollIndicator={false}
+              nestedScrollEnabled={true}
+              scrollEventThrottle={16}
+              onScrollBeginDrag={handleScrollBeginDrag}
+              onMomentumScrollEnd={handleMomentumScrollEnd}
             >
-              <Text style={styles.adCtaText}>{currentAd.ctaText}</Text>
-              <Ionicons name="arrow-forward" size={14} color={colors.textOnPrimary} />
-            </TouchableOpacity>
+              {HOME_ADS.map((ad) => (
+                <View key={ad.id} style={{ width: bannerWidth }}>
+                  {/* Ad Body */}
+                  <View style={styles.adContent}>
+                    <View style={styles.adCategoryPill}>
+                      <Text style={styles.adCategoryText}>{ad.badge}</Text>
+                    </View>
+                    <Text style={styles.adTitle}>{ad.title}</Text>
+                    <Text style={styles.adSubtitle}>{ad.subtitle}</Text>
+
+                    {/* Ad Highlight Box */}
+                    <View style={styles.adHighlightBox}>
+                      <Ionicons name="sparkles" size={14} color={colors.secondary} />
+                      <Text style={styles.adHighlightText}>{ad.highlight}</Text>
+                    </View>
+                  </View>
+
+                  {/* Ad Footer & CTA */}
+                  <View style={styles.adFooter}>
+                    {ad.promoCode && (
+                      <View style={styles.promoCodeBox}>
+                        <Text style={styles.promoCodeLabel}>CODE:</Text>
+                        <Text style={styles.promoCodeValue}>{ad.promoCode}</Text>
+                      </View>
+                    )}
+                    <TouchableOpacity
+                      style={styles.adCtaBtn}
+                      activeOpacity={0.8}
+                      onPress={() =>
+                        showPopup({
+                          type: 'success',
+                          icon: 'sparkles',
+                          title: ad.title,
+                          message: `${ad.subtitle}\n\nPromo code ${ad.promoCode || 'AUTOMATIC'} has been credited to your BetWinner wallet!`,
+                          primaryText: 'Claim Bonus',
+                          secondaryText: 'Close',
+                          onConfirm: () => {
+                            showToast({
+                              type: 'success',
+                              title: 'Promo Claimed Successfully!',
+                              message: `${ad.badge} bonus active on your next betslip purchase.`,
+                            });
+                          },
+                        })
+                      }
+                    >
+                      <Text style={styles.adCtaText}>{ad.ctaText}</Text>
+                      <Ionicons name="arrow-forward" size={14} color={colors.textOnPrimary} />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              ))}
+            </ScrollView>
           </View>
         </View>
 
@@ -726,12 +839,18 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     borderWidth: 1,
     borderColor: colors.cardBorder,
+    overflow: 'hidden',
   },
   adTopBar: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 10,
+  },
+  sponsoredBadgeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
   },
   sponsoredBadge: {
     flexDirection: 'row',
@@ -749,6 +868,25 @@ const styles = StyleSheet.create({
     fontSize: 9,
     fontWeight: '800',
     letterSpacing: 0.6,
+  },
+  autoPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.badgeGoldBg,
+    paddingHorizontal: 6,
+    paddingVertical: 3,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: colors.badgeGoldBorder,
+    gap: 3,
+  },
+  autoPillText: {
+    color: colors.gold,
+    fontSize: 9,
+    fontWeight: '800',
+  },
+  carouselContainer: {
+    width: '100%',
   },
   adControlsRow: {
     flexDirection: 'row',
@@ -796,12 +934,14 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontWeight: '800',
     marginBottom: 4,
+    minHeight: 22,
   },
   adSubtitle: {
     color: colors.textSecondary,
     fontSize: 12,
     lineHeight: 17,
     marginBottom: 8,
+    minHeight: 34,
   },
   adHighlightBox: {
     flexDirection: 'row',
