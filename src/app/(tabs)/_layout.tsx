@@ -31,8 +31,8 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: colors.textMuted,
+        tabBarActiveTintColor: colors.secondary,
+        tabBarInactiveTintColor: colors.tabBarInactive,
         tabBarHideOnKeyboard: true,
         tabBarStyle: {
           position: 'absolute',
@@ -41,11 +41,11 @@ export default function TabLayout() {
           right: 16,
           height: 68,
           borderRadius: 34,
-          backgroundColor: '#111A2C',
+          backgroundColor: colors.tabBar,
           borderWidth: 1.5,
-          borderColor: '#22324D',
+          borderColor: colors.tabBarBorder,
           borderTopWidth: 1.5,
-          borderTopColor: '#22324D',
+          borderTopColor: colors.tabBarBorder,
           elevation: 12,
           shadowColor: '#000000',
           shadowOffset: { width: 0, height: 10 },
@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   dockIconBoxActive: {
-    backgroundColor: 'rgba(0, 210, 106, 0.12)',
+    backgroundColor: colors.accentAlpha,
   },
   activeGlowDot: {
     position: 'absolute',
@@ -141,13 +141,13 @@ const styles = StyleSheet.create({
     width: 4,
     height: 4,
     borderRadius: 2,
-    backgroundColor: colors.primary,
+    backgroundColor: colors.secondary,
   },
   badge: {
     position: 'absolute',
     top: 2,
     right: 4,
-    backgroundColor: colors.primary,
+    backgroundColor: colors.secondary,
     minWidth: 16,
     height: 16,
     borderRadius: 8,
@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 3,
   },
   badgeText: {
-    color: colors.background,
+    color: colors.primary,
     fontSize: 9,
     fontWeight: '800',
   },
