@@ -166,7 +166,9 @@ const styles = StyleSheet.create({
   vipBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(251, 191, 36, 0.15)',
+    backgroundColor: colors.badgeGoldBg,
+    borderWidth: 1,
+    borderColor: colors.badgeGoldBorder,
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 6,

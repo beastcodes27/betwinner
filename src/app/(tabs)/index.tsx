@@ -172,7 +172,9 @@ const styles = StyleSheet.create({
   },
   tag: {
     alignSelf: 'flex-start',
-    backgroundColor: colors.accentAlpha,
+    backgroundColor: colors.badgeGreenBg,
+    borderWidth: 1,
+    borderColor: colors.badgeGreenBorder,
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 6,
@@ -229,7 +231,9 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   confidenceBadge: {
-    backgroundColor: colors.accentAlpha,
+    backgroundColor: colors.badgeGreenBg,
+    borderWidth: 1,
+    borderColor: colors.badgeGreenBorder,
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 12,

@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   dockIconBoxActive: {
-    backgroundColor: colors.accentAlpha,
+    backgroundColor: colors.dockItemActive,
   },
   activeGlowDot: {
     position: 'absolute',
