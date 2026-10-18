@@ -159,7 +159,7 @@ export default function BetslipScreen() {
                 activeOpacity={0.8}
               >
                 <Text style={styles.viewSlipText}>View Slip</Text>
-                <Ionicons name="arrow-forward" size={15} color={colors.primary} />
+                <Ionicons name="arrow-forward" size={15} color={colors.textOnPrimary} />
               </TouchableOpacity>
             </View>
           </View>
@@ -255,7 +255,7 @@ export default function BetslipScreen() {
                 <Ionicons
                   name={copiedCode === activeSlip?.bookingCode ? 'checkmark-circle' : 'copy-outline'}
                   size={18}
-                  color={copiedCode === activeSlip?.bookingCode ? colors.primary : colors.primary}
+                  color={colors.textOnPrimary}
                 />
                 <Text style={styles.copyBtnText}>
                   {copiedCode === activeSlip?.bookingCode ? 'Copied!' : 'Copy Code'}
@@ -323,8 +323,8 @@ const styles = StyleSheet.create({
     borderColor: colors.cardBorder,
   },
   filterPillActive: {
-    backgroundColor: colors.secondary,
-    borderColor: colors.secondary,
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
   },
   filterPillText: {
     color: colors.textSecondary,
@@ -332,7 +332,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   filterPillTextActive: {
-    color: colors.primary,
+    color: colors.textOnPrimary,
     fontWeight: '800',
   },
   scrollContent: {
@@ -534,14 +534,14 @@ const styles = StyleSheet.create({
   viewSlipBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.secondary,
+    backgroundColor: colors.primary,
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 10,
     gap: 6,
   },
   viewSlipText: {
-    color: colors.primary,
+    color: colors.textOnPrimary,
     fontSize: 13,
     fontWeight: '800',
   },
@@ -737,7 +737,7 @@ const styles = StyleSheet.create({
   copyBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.secondary,
+    backgroundColor: colors.primary,
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: 10,
@@ -747,7 +747,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.secondary,
   },
   copyBtnText: {
-    color: colors.primary,
+    color: colors.textOnPrimary,
     fontSize: 13,
     fontWeight: '800',
   },

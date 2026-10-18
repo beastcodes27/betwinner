@@ -31,7 +31,7 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: colors.secondary,
+        tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.tabBarInactive,
         tabBarHideOnKeyboard: true,
         tabBarStyle: {
@@ -141,13 +141,13 @@ const styles = StyleSheet.create({
     width: 4,
     height: 4,
     borderRadius: 2,
-    backgroundColor: colors.secondary,
+    backgroundColor: colors.primary,
   },
   badge: {
     position: 'absolute',
     top: 2,
     right: 4,
-    backgroundColor: colors.secondary,
+    backgroundColor: colors.primary,
     minWidth: 16,
     height: 16,
     borderRadius: 8,
@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 3,
   },
   badgeText: {
-    color: colors.primary,
+    color: colors.textOnPrimary,
     fontSize: 9,
     fontWeight: '800',
   },

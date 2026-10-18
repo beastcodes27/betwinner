@@ -65,7 +65,7 @@ export default function HomeScreen() {
               <Text style={styles.predictionValue}>Home Win (1)</Text>
             </View>
             <TouchableOpacity style={styles.addToSlipBtn} activeOpacity={0.7}>
-              <Ionicons name="add-circle-outline" size={18} color={colors.primary} />
+              <Ionicons name="add-circle-outline" size={18} color={colors.textOnPrimary} />
               <Text style={styles.addToSlipText}>Add to slip</Text>
             </TouchableOpacity>
           </View>
@@ -97,7 +97,7 @@ export default function HomeScreen() {
               <Text style={styles.predictionValue}>Over 2.5 Goals</Text>
             </View>
             <TouchableOpacity style={styles.addToSlipBtn} activeOpacity={0.7}>
-              <Ionicons name="add-circle-outline" size={18} color={colors.primary} />
+              <Ionicons name="add-circle-outline" size={18} color={colors.textOnPrimary} />
               <Text style={styles.addToSlipText}>Add to slip</Text>
             </TouchableOpacity>
           </View>
@@ -287,14 +287,14 @@ const styles = StyleSheet.create({
   addToSlipBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.secondary,
+    backgroundColor: colors.primary,
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 8,
     gap: 4,
   },
   addToSlipText: {
-    color: colors.primary,
+    color: colors.textOnPrimary,
     fontSize: 12,
     fontWeight: '700',
   },

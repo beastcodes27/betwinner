@@ -135,7 +135,7 @@ export default function FollowingScreen() {
                   </>
                 ) : (
                   <>
-                    <Ionicons name="add" size={14} color={colors.primary} />
+                    <Ionicons name="add" size={14} color={colors.textOnPrimary} />
                     <Text style={styles.followBtnText}>Follow</Text>
                   </>
                 )}
@@ -196,7 +196,7 @@ export default function FollowingScreen() {
                   activeOpacity={0.8}
                 >
                   <Text style={styles.viewSlipShortcutText}>View Published Slip</Text>
-                  <Ionicons name="arrow-forward" size={14} color={colors.primary} />
+                  <Ionicons name="arrow-forward" size={14} color={colors.textOnPrimary} />
                 </TouchableOpacity>
               </View>
             )}
@@ -293,7 +293,7 @@ export default function FollowingScreen() {
                 <Ionicons
                   name={copiedCode === activeSlip?.bookingCode ? 'checkmark-circle' : 'copy-outline'}
                   size={18}
-                  color={colors.primary}
+                  color={colors.textOnPrimary}
                 />
                 <Text style={styles.copyBtnText}>
                   {copiedCode === activeSlip?.bookingCode ? 'Copied!' : 'Copy Code'}
@@ -490,10 +490,10 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   followBtn: {
-    backgroundColor: colors.secondary,
+    backgroundColor: colors.primary,
   },
   followBtnText: {
-    color: colors.primary,
+    color: colors.textOnPrimary,
     fontSize: 12,
     fontWeight: '800',
   },
@@ -625,13 +625,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.secondary,
+    backgroundColor: colors.primary,
     paddingVertical: 8,
     borderRadius: 8,
     gap: 6,
   },
   viewSlipShortcutText: {
-    color: colors.primary,
+    color: colors.textOnPrimary,
     fontSize: 12,
     fontWeight: '800',
   },
@@ -833,7 +833,7 @@ const styles = StyleSheet.create({
   copyBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.secondary,
+    backgroundColor: colors.primary,
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: 10,
@@ -843,7 +843,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.secondary,
   },
   copyBtnText: {
-    color: colors.primary,
+    color: colors.textOnPrimary,
     fontSize: 13,
     fontWeight: '800',
   },

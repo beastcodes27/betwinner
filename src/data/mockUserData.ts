@@ -373,3 +373,4 @@ export const FAQS: FaqItem[] = [
       'Navigate to the Following tab or tap any tipster card, then press the "Follow" button. Enable "Alerts" to get notified the second they post a new slip.',
   },
 ];
+

@@ -461,7 +461,7 @@ export default function ProfileScreen() {
                     <Ionicons
                       name={selectedSlip?.id === slip.id ? 'chevron-up' : 'chevron-down'}
                       size={14}
-                      color={colors.primary}
+                      color={colors.textOnPrimary}
                     />
                   </TouchableOpacity>
                 </View>
@@ -1211,8 +1211,8 @@ const styles = StyleSheet.create({
     borderColor: colors.cardBorder,
   },
   statusFilterPillActive: {
-    backgroundColor: colors.secondary,
-    borderColor: colors.secondary,
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
   },
   statusFilterText: {
     color: colors.textSecondary,
@@ -1220,7 +1220,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   statusFilterTextActive: {
-    color: colors.primary,
+    color: colors.textOnPrimary,
     fontWeight: '900',
   },
   modalScroll: {
@@ -1404,14 +1404,14 @@ const styles = StyleSheet.create({
   viewSelectionsBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.secondary,
+    backgroundColor: colors.primary,
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 8,
     gap: 4,
   },
   viewSelectionsText: {
-    color: colors.primary,
+    color: colors.textOnPrimary,
     fontSize: 12,
     fontWeight: '800',
   },
@@ -1801,13 +1801,13 @@ const styles = StyleSheet.create({
   },
   confirmLogoutBtn: {
     flex: 1,
-    backgroundColor: colors.secondary,
+    backgroundColor: colors.primary,
     paddingVertical: 12,
     borderRadius: 10,
     alignItems: 'center',
   },
   confirmLogoutBtnText: {
-    color: colors.primary,
+    color: colors.textOnPrimary,
     fontSize: 13,
     fontWeight: '800',
   },
