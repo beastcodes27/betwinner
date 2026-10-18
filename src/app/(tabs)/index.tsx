@@ -239,15 +239,9 @@ export default function HomeScreen() {
         <View style={styles.adBoardCard}>
           {/* Ad Card Header */}
           <View style={styles.adTopBar}>
-            <View style={styles.sponsoredBadgeRow}>
-              <View style={styles.sponsoredBadge}>
-                <Ionicons name="megaphone" size={12} color={colors.gold} />
-                <Text style={styles.sponsoredBadgeText}>SPONSORED PROMO</Text>
-              </View>
-              <View style={styles.autoPill}>
-                <Ionicons name="sync" size={9} color={colors.gold} />
-                <Text style={styles.autoPillText}>3s</Text>
-              </View>
+            <View style={styles.sponsoredBadge}>
+              <Ionicons name="megaphone" size={12} color={colors.gold} />
+              <Text style={styles.sponsoredBadgeText}>SPONSORED PROMO</Text>
             </View>
 
             {/* Slide Indicators & Controls */}
@@ -847,11 +841,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 10,
   },
-  sponsoredBadgeRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
   sponsoredBadge: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -868,22 +857,6 @@ const styles = StyleSheet.create({
     fontSize: 9,
     fontWeight: '800',
     letterSpacing: 0.6,
-  },
-  autoPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.badgeGoldBg,
-    paddingHorizontal: 6,
-    paddingVertical: 3,
-    borderRadius: 6,
-    borderWidth: 1,
-    borderColor: colors.badgeGoldBorder,
-    gap: 3,
-  },
-  autoPillText: {
-    color: colors.gold,
-    fontSize: 9,
-    fontWeight: '800',
   },
   carouselContainer: {
     width: '100%',
