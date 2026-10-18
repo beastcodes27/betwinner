@@ -12,6 +12,9 @@ import { Ionicons } from '@expo/vector-icons';
 import { colors } from '@/constants/theme';
 import { useAppUI } from '@/context/UIContext';
 import BookmakerLogo from '@/components/BookmakerLogo';
+import TipsterAvatar from '@/components/TipsterAvatar';
+import AvatarUploadModal from '@/components/AvatarUploadModal';
+import { TIPSTER_AVATARS } from '@/data/mockSlips';
 import {
   MOCK_PURCHASED_SLIPS,
   MOCK_PAYMENTS,
@@ -40,6 +43,8 @@ export default function ProfileScreen() {
   const [expandedFaq, setExpandedFaq] = useState<string | null>('faq-1');
   const [isLoggedOut, setIsLoggedOut] = useState(false);
   const [isAccountDeleted, setIsAccountDeleted] = useState(false);
+  const [profileAvatar, setProfileAvatar] = useState<any>(TIPSTER_AVATARS.alex_user);
+  const [showAvatarModal, setShowAvatarModal] = useState(false);
 
   const handleCopyCode = (code: string) => {
     setCopiedCode(code);
@@ -108,9 +113,22 @@ export default function ProfileScreen() {
       >
         {/* Profile Card */}
         <View style={styles.userCard}>
-          <View style={styles.avatar}>
-            <Text style={styles.avatarText}>AB</Text>
-          </View>
+          <TouchableOpacity
+            style={styles.avatarTouchable}
+            activeOpacity={0.8}
+            onPress={() => setShowAvatarModal(true)}
+          >
+            <TipsterAvatar
+              name={isAccountDeleted ? 'Account Deleted' : 'Alex Bettor'}
+              source={profileAvatar}
+              size={64}
+              borderWidth={2}
+              borderColor={colors.gold}
+            />
+            <View style={styles.cameraIconBadge}>
+              <Ionicons name="camera" size={13} color={colors.textOnPrimary} />
+            </View>
+          </TouchableOpacity>
           <View style={styles.userInfo}>
             <View style={styles.userNameRow}>
               <Text style={styles.userName}>
@@ -354,13 +372,13 @@ export default function ProfileScreen() {
                 {/* Header info */}
                 <View style={styles.purchasedCardHeader}>
                   <View style={styles.purchasedTipsterRow}>
-                    <View
-                      style={[styles.purchasedAvatar, { backgroundColor: slip.tipsterAvatarBg }]}
-                    >
-                      <Text style={styles.purchasedAvatarText}>
-                        {slip.tipsterName.substring(0, 1)}
-                      </Text>
-                    </View>
+                    <TipsterAvatar
+                      name={slip.tipsterName}
+                      source={slip.tipsterAvatarUrl}
+                      avatarBg={slip.tipsterAvatarBg}
+                      size="sm"
+                      style={{ marginRight: 10 }}
+                    />
                     <View>
                       <Text style={styles.purchasedTipsterName}>{slip.tipsterName}</Text>
                       <Text style={styles.purchasedTipsterHandle}>{slip.tipsterHandle}</Text>
@@ -934,6 +952,15 @@ export default function ProfileScreen() {
           </View>
         </View>
       </Modal>
+
+      {/* Avatar Upload Modal */}
+      <AvatarUploadModal
+        visible={showAvatarModal}
+        currentAvatar={profileAvatar}
+        userName={isAccountDeleted ? 'Account Deleted' : 'Alex Bettor'}
+        onClose={() => setShowAvatarModal(false)}
+        onSaveAvatar={(newAvatar) => setProfileAvatar(newAvatar)}
+      />
     </SafeAreaView>
   );
 }
@@ -995,6 +1022,23 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     borderWidth: 1,
     borderColor: colors.cardBorder,
+  },
+  avatarTouchable: {
+    position: 'relative',
+    marginRight: 14,
+  },
+  cameraIconBadge: {
+    position: 'absolute',
+    bottom: -2,
+    right: -2,
+    backgroundColor: colors.primary,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: colors.card,
   },
   avatar: {
     width: 60,

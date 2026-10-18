@@ -17,6 +17,7 @@ import {
 } from '@/data/mockSlips';
 import { useAppUI } from '@/context/UIContext';
 import BookmakerLogo from '@/components/BookmakerLogo';
+import TipsterAvatar from '@/components/TipsterAvatar';
 
 export default function FollowingScreen() {
   const { showToast } = useAppUI();
@@ -119,10 +120,15 @@ export default function FollowingScreen() {
           <View key={tipster.id} style={styles.tipsterCard}>
             {/* Top Row: Avatar, Name, Follow & Notification buttons */}
             <View style={styles.cardTopRow}>
-              <View style={[styles.avatar, { backgroundColor: tipster.avatarBg }]}>
-                <Text style={styles.avatarText}>{tipster.name.charAt(0)}</Text>
-                <View style={styles.onlinePulse} />
-              </View>
+              <TipsterAvatar
+                name={tipster.name}
+                source={tipster.avatarUrl}
+                avatarBg={tipster.avatarBg}
+                size="md"
+                showOnlinePulse={true}
+                showVerifiedBadge={tipster.verified}
+                style={{ marginRight: 12 }}
+              />
 
               <View style={styles.profileInfo}>
                 <View style={styles.nameRow}>
@@ -249,9 +255,20 @@ export default function FollowingScreen() {
           <View style={styles.modalContent}>
             {/* Modal Header */}
             <View style={styles.modalHeader}>
-              <View>
-                <Text style={styles.modalSubtitle}>{activeSlip?.tipster.name}&apos;S BETSLIP</Text>
-                <Text style={styles.modalTitle}>{activeSlip?.title}</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1, gap: 12 }}>
+                {activeSlip && (
+                  <TipsterAvatar
+                    name={activeSlip.tipster.name}
+                    source={activeSlip.tipster.avatarUrl}
+                    avatarBg={activeSlip.tipster.avatarBg}
+                    size="md"
+                    showVerifiedBadge={activeSlip.tipster.verified}
+                  />
+                )}
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.modalSubtitle}>{activeSlip?.tipster.name}&apos;S BETSLIP</Text>
+                  <Text style={styles.modalTitle} numberOfLines={1}>{activeSlip?.title}</Text>
+                </View>
               </View>
               <TouchableOpacity
                 onPress={() => setActiveSlip(null)}
