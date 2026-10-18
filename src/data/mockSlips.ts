@@ -17,6 +17,15 @@ export const LEAGUE_LOGOS = {
   epl: require('../../assets/leagues/epl.png'),
 } as const;
 
+export const TIPSTER_AVATARS = {
+  juma: require('../../assets/avatars/juma.png'),
+  kassim: require('../../assets/avatars/kassim.png'),
+  mwamba: require('../../assets/avatars/mwamba.png'),
+  vip_elite: require('../../assets/avatars/vip_elite.png'),
+  tactical_pro: require('../../assets/avatars/tactical_pro.png'),
+  alex_user: require('../../assets/avatars/alex_user.png'),
+} as const;
+
 export interface MatchSelection {
   id: string;
   match: string;
@@ -31,6 +40,7 @@ export interface TipsterProfile {
   name: string;
   handle: string;
   avatarBg: string;
+  avatarUrl?: any;
   winRate: string;
   badge: string;
   followers: string;
@@ -61,6 +71,7 @@ export const MOCK_SLIPS: TipsterSlip[] = [
       name: 'Captain Odds',
       handle: '@captain_odds',
       avatarBg: '#3B82F6',
+      avatarUrl: TIPSTER_AVATARS.juma,
       winRate: '86% Win Rate',
       badge: 'TOP TIPSTER 🔥',
       followers: '24.5k',
@@ -122,6 +133,7 @@ export const MOCK_SLIPS: TipsterSlip[] = [
       name: 'Goal Master AI',
       handle: '@goal_master',
       avatarBg: '#8B5CF6',
+      avatarUrl: TIPSTER_AVATARS.kassim,
       winRate: '82% Win Rate',
       badge: 'AI PREDICTOR 🤖',
       followers: '18.2k',
@@ -192,6 +204,7 @@ export const MOCK_SLIPS: TipsterSlip[] = [
       name: 'Sniper Bets',
       handle: '@sniper_bets',
       avatarBg: '#EC4899',
+      avatarUrl: TIPSTER_AVATARS.mwamba,
       winRate: '91% Win Rate',
       badge: 'STREAK 9W 🔥',
       followers: '31.8k',
@@ -235,6 +248,7 @@ export const MOCK_SLIPS: TipsterSlip[] = [
       name: 'VIP Elite Club',
       handle: '@vip_elite',
       avatarBg: '#F59E0B',
+      avatarUrl: TIPSTER_AVATARS.vip_elite,
       winRate: '88% Win Rate',
       badge: 'EXCLUSIVE VIP 👑',
       followers: '45.1k',
@@ -314,6 +328,7 @@ export const MOCK_SLIPS: TipsterSlip[] = [
       name: 'Tactical Draw Pro',
       handle: '@draw_tactics',
       avatarBg: '#10B981',
+      avatarUrl: TIPSTER_AVATARS.tactical_pro,
       winRate: '75% Win Rate',
       badge: 'DRAW SPECIALIST 🎯',
       followers: '14.3k',
@@ -367,6 +382,7 @@ export interface FollowedTipster {
   name: string;
   handle: string;
   avatarBg: string;
+  avatarUrl?: any;
   winRate: string;
   badge: string;
   followers: string;
@@ -385,6 +401,7 @@ export const FOLLOWED_TIPSTERS: FollowedTipster[] = [
     name: 'Captain Odds',
     handle: '@captain_odds',
     avatarBg: '#3B82F6',
+    avatarUrl: TIPSTER_AVATARS.juma,
     winRate: '86% Win Rate',
     badge: 'TOP TIPSTER 🔥',
     followers: '24.5k',
@@ -401,6 +418,7 @@ export const FOLLOWED_TIPSTERS: FollowedTipster[] = [
     name: 'Sniper Bets',
     handle: '@sniper_bets',
     avatarBg: '#EC4899',
+    avatarUrl: TIPSTER_AVATARS.mwamba,
     winRate: '91% Win Rate',
     badge: 'STREAK 9W 🔥',
     followers: '31.8k',
@@ -417,6 +435,7 @@ export const FOLLOWED_TIPSTERS: FollowedTipster[] = [
     name: 'Goal Master AI',
     handle: '@goal_master',
     avatarBg: '#8B5CF6',
+    avatarUrl: TIPSTER_AVATARS.kassim,
     winRate: '82% Win Rate',
     badge: 'AI PREDICTOR 🤖',
     followers: '18.2k',
@@ -433,6 +452,7 @@ export const FOLLOWED_TIPSTERS: FollowedTipster[] = [
     name: 'VIP Elite Club',
     handle: '@vip_elite',
     avatarBg: '#F59E0B',
+    avatarUrl: TIPSTER_AVATARS.vip_elite,
     winRate: '88% Win Rate',
     badge: 'EXCLUSIVE VIP 👑',
     followers: '45.1k',
@@ -449,6 +469,7 @@ export const FOLLOWED_TIPSTERS: FollowedTipster[] = [
     name: 'Tactical Draw Pro',
     handle: '@draw_tactics',
     avatarBg: '#10B981',
+    avatarUrl: TIPSTER_AVATARS.tactical_pro,
     winRate: '75% Win Rate',
     badge: 'DRAW SPECIALIST 🎯',
     followers: '14.3k',
@@ -587,6 +608,7 @@ export const ALL_TIPSTERS: FollowedTipster[] = [
     name: 'King of Draws',
     handle: '@kingdraws',
     avatarBg: '#F59E0B',
+    avatarUrl: TIPSTER_AVATARS.tactical_pro,
     winRate: '78% Win Rate',
     badge: 'DRAW MASTER ⚖️',
     followers: '19.4k',
@@ -602,6 +624,7 @@ export const ALL_TIPSTERS: FollowedTipster[] = [
     name: 'Stats Wizard',
     handle: '@statswiz',
     avatarBg: '#EC4899',
+    avatarUrl: TIPSTER_AVATARS.mwamba,
     winRate: '89% Win Rate',
     badge: 'CORNER & CARDS 🟨',
     followers: '27.1k',
@@ -617,6 +640,7 @@ export const ALL_TIPSTERS: FollowedTipster[] = [
     name: 'Bet Master Pro',
     handle: '@betmaster_ke',
     avatarBg: '#10B981',
+    avatarUrl: TIPSTER_AVATARS.juma,
     winRate: '93% Win Rate',
     badge: 'TOP RATED 🏆',
     followers: '52.8k',

@@ -1,4 +1,4 @@
-import { MatchSelection, BOOKMAKER_LOGOS } from './mockSlips';
+import { MatchSelection, BOOKMAKER_LOGOS, TIPSTER_AVATARS } from './mockSlips';
 
 export interface PurchasedSlip {
   id: string;
@@ -7,6 +7,7 @@ export interface PurchasedSlip {
   tipsterName: string;
   tipsterHandle: string;
   tipsterAvatarBg: string;
+  tipsterAvatarUrl?: any;
   bookmaker: string;
   bookmakerLogo?: any;
   bookingCode: string;
@@ -46,6 +47,7 @@ export const MOCK_PURCHASED_SLIPS: PurchasedSlip[] = [
     tipsterName: 'Bet Master Pro',
     tipsterHandle: '@betmaster_ke',
     tipsterAvatarBg: '#10B981',
+    tipsterAvatarUrl: TIPSTER_AVATARS.juma,
     bookmaker: 'SportyBet',
     bookmakerLogo: BOOKMAKER_LOGOS.sportybet,
     bookingCode: 'SPY-77192',
@@ -119,6 +121,7 @@ export const MOCK_PURCHASED_SLIPS: PurchasedSlip[] = [
     tipsterName: 'King of Draws',
     tipsterHandle: '@kingdraws',
     tipsterAvatarBg: '#F59E0B',
+    tipsterAvatarUrl: TIPSTER_AVATARS.tactical_pro,
     bookmaker: 'Betika',
     bookmakerLogo: BOOKMAKER_LOGOS.betika,
     bookingCode: 'BTK-55201',
@@ -165,6 +168,7 @@ export const MOCK_PURCHASED_SLIPS: PurchasedSlip[] = [
     tipsterName: 'Goal Hunter',
     tipsterHandle: '@goal_hunter',
     tipsterAvatarBg: '#8B5CF6',
+    tipsterAvatarUrl: TIPSTER_AVATARS.kassim,
     bookmaker: '1xBet',
     bookmakerLogo: BOOKMAKER_LOGOS['1xbet'],
     bookingCode: '1XB-88319',
