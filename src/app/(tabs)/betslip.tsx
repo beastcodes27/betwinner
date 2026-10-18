@@ -128,12 +128,29 @@ export default function BetslipScreen() {
               </View>
             </View>
 
-            {/* Bottom Actions: Confidence & View Slip Button */}
+            {/* Bottom Actions: Betting Company & Booking Code + View Slip Button */}
             <View style={styles.cardFooter}>
-              <View style={styles.confidenceBox}>
-                <Ionicons name="shield-checkmark-outline" size={16} color={colors.secondary} />
-                <Text style={styles.confidenceScore}>{slip.confidence}% Confidence</Text>
-              </View>
+              {/* Betting Company & Booking Code (Replaces confidence %) */}
+              <TouchableOpacity
+                style={[
+                  styles.bookmakerCodePill,
+                  copiedCode === slip.bookingCode && styles.bookmakerCodePillCopied,
+                ]}
+                onPress={() => handleCopyCode(slip.bookingCode)}
+                activeOpacity={0.7}
+              >
+                <View style={styles.bookmakerBadge}>
+                  <Text style={styles.bookmakerBadgeText}>{slip.bookmaker.toUpperCase()}</Text>
+                </View>
+                <View style={styles.codeRow}>
+                  <Text style={styles.codeText}>{slip.bookingCode}</Text>
+                  <Ionicons
+                    name={copiedCode === slip.bookingCode ? 'checkmark-circle' : 'copy-outline'}
+                    size={14}
+                    color={copiedCode === slip.bookingCode ? colors.secondary : colors.textMuted}
+                  />
+                </View>
+              </TouchableOpacity>
 
               {/* View Slip Button */}
               <TouchableOpacity
@@ -142,7 +159,7 @@ export default function BetslipScreen() {
                 activeOpacity={0.8}
               >
                 <Text style={styles.viewSlipText}>View Slip</Text>
-                <Ionicons name="arrow-forward" size={16} color={colors.primary} />
+                <Ionicons name="arrow-forward" size={15} color={colors.primary} />
               </TouchableOpacity>
             </View>
           </View>
@@ -222,7 +239,12 @@ export default function BetslipScreen() {
             {/* Booking Code Bar */}
             <View style={styles.bookingCodeSection}>
               <View style={styles.codeInfo}>
-                <Text style={styles.codeLabel}>BOOKING CODE</Text>
+                <View style={styles.modalBookmakerRow}>
+                  <Text style={styles.codeLabel}>BOOKING CODE</Text>
+                  <View style={styles.modalBookmakerBadge}>
+                    <Text style={styles.modalBookmakerText}>{activeSlip?.bookmaker.toUpperCase()}</Text>
+                  </View>
+                </View>
                 <Text style={styles.codeValue}>{activeSlip?.bookingCode}</Text>
               </View>
               <TouchableOpacity
@@ -383,12 +405,12 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   freeBadge: {
-    backgroundColor: colors.accentAlpha,
-    borderColor: 'rgba(57, 255, 136, 0.3)',
+    backgroundColor: colors.badgeGreenBg,
+    borderColor: colors.badgeGreenBorder,
   },
   paidBadge: {
-    backgroundColor: 'rgba(251, 191, 36, 0.15)',
-    borderColor: 'rgba(251, 191, 36, 0.3)',
+    backgroundColor: colors.badgeGoldBg,
+    borderColor: colors.badgeGoldBorder,
   },
   amountText: {
     fontSize: 12,
@@ -469,15 +491,45 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: colors.cardBorder,
   },
-  confidenceBox: {
+  bookmakerCodePill: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    backgroundColor: colors.cardInner,
+    borderRadius: 8,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    borderWidth: 1,
+    borderColor: colors.cardBorder,
+    gap: 8,
   },
-  confidenceScore: {
+  bookmakerCodePillCopied: {
+    borderColor: colors.secondary,
+    backgroundColor: colors.badgeGreenBg,
+  },
+  bookmakerBadge: {
+    backgroundColor: colors.badgeGreenBg,
+    borderWidth: 1,
+    borderColor: colors.badgeGreenBorder,
+    paddingHorizontal: 5,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  bookmakerBadgeText: {
     color: colors.secondary,
-    fontSize: 13,
-    fontWeight: '700',
+    fontSize: 9,
+    fontWeight: '900',
+    letterSpacing: 0.6,
+  },
+  codeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+  },
+  codeText: {
+    color: colors.text,
+    fontSize: 12,
+    fontWeight: '800',
+    letterSpacing: 0.6,
   },
   viewSlipBtn: {
     flexDirection: 'row',
@@ -625,7 +677,9 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   itemOddsBadge: {
-    backgroundColor: colors.accentAlpha,
+    backgroundColor: colors.badgeGreenBg,
+    borderWidth: 1,
+    borderColor: colors.badgeGreenBorder,
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 6,
@@ -647,6 +701,25 @@ const styles = StyleSheet.create({
   },
   codeInfo: {
     flex: 1,
+  },
+  modalBookmakerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  modalBookmakerBadge: {
+    backgroundColor: colors.badgeGreenBg,
+    borderWidth: 1,
+    borderColor: colors.badgeGreenBorder,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  modalBookmakerText: {
+    color: colors.secondary,
+    fontSize: 9,
+    fontWeight: '900',
+    letterSpacing: 0.6,
   },
   codeLabel: {
     color: colors.textMuted,
