@@ -23,7 +23,7 @@ export default function ProfileScreen() {
             <Text style={styles.userName}>Pro Bettor</Text>
             <Text style={styles.userEmail}>member@betwinner.app</Text>
             <View style={styles.vipBadge}>
-              <Ionicons name="star" size={12} color={colors.secondary} />
+              <Ionicons name="star" size={12} color={colors.gold} />
               <Text style={styles.vipText}>PRO VIP MEMBER</Text>
             </View>
           </View>
@@ -51,20 +51,20 @@ export default function ProfileScreen() {
 
           <View style={styles.settingItem}>
             <View style={styles.settingLeft}>
-              <Ionicons name="notifications-outline" size={22} color={colors.primary} />
+              <Ionicons name="notifications-outline" size={22} color={colors.secondary} />
               <Text style={styles.settingText}>Daily Tip Alerts</Text>
             </View>
             <Switch
               value={notificationsEnabled}
               onValueChange={setNotificationsEnabled}
-              trackColor={{ false: colors.cardBorder, true: colors.primary }}
+              trackColor={{ false: colors.cardBorder, true: colors.secondary }}
               thumbColor={colors.text}
             />
           </View>
 
           <TouchableOpacity style={styles.settingItem}>
             <View style={styles.settingLeft}>
-              <Ionicons name="shield-outline" size={22} color={colors.primary} />
+              <Ionicons name="shield-outline" size={22} color={colors.secondary} />
               <Text style={styles.settingText}>VIP Subscriptions</Text>
             </View>
             <Ionicons name="chevron-forward" size={20} color={colors.textMuted} />
@@ -72,7 +72,7 @@ export default function ProfileScreen() {
 
           <TouchableOpacity style={styles.settingItem}>
             <View style={styles.settingLeft}>
-              <Ionicons name="calculator-outline" size={22} color={colors.primary} />
+              <Ionicons name="calculator-outline" size={22} color={colors.secondary} />
               <Text style={styles.settingText}>Odds Format (Decimal)</Text>
             </View>
             <Ionicons name="chevron-forward" size={20} color={colors.textMuted} />
@@ -85,7 +85,7 @@ export default function ProfileScreen() {
 
           <TouchableOpacity style={styles.settingItem}>
             <View style={styles.settingLeft}>
-              <Ionicons name="help-circle-outline" size={22} color={colors.primary} />
+              <Ionicons name="help-circle-outline" size={22} color={colors.secondary} />
               <Text style={styles.settingText}>Help & FAQ</Text>
             </View>
             <Ionicons name="chevron-forward" size={20} color={colors.textMuted} />
@@ -93,7 +93,7 @@ export default function ProfileScreen() {
 
           <TouchableOpacity style={styles.settingItem}>
             <View style={styles.settingLeft}>
-              <Ionicons name="document-text-outline" size={22} color={colors.primary} />
+              <Ionicons name="document-text-outline" size={22} color={colors.secondary} />
               <Text style={styles.settingText}>Responsible Gambling Disclaimer</Text>
             </View>
             <Ionicons name="chevron-forward" size={20} color={colors.textMuted} />
@@ -101,7 +101,7 @@ export default function ProfileScreen() {
 
           <TouchableOpacity style={styles.settingItem}>
             <View style={styles.settingLeft}>
-              <Ionicons name="information-circle-outline" size={22} color={colors.primary} />
+              <Ionicons name="information-circle-outline" size={22} color={colors.secondary} />
               <Text style={styles.settingText}>App Version 1.0.0</Text>
             </View>
           </TouchableOpacity>
@@ -166,7 +166,7 @@ const styles = StyleSheet.create({
   vipBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(245, 158, 11, 0.15)',
+    backgroundColor: 'rgba(251, 191, 36, 0.15)',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 6,
@@ -175,7 +175,7 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   vipText: {
-    color: colors.secondary,
+    color: colors.gold,
     fontSize: 10,
     fontWeight: '800',
     letterSpacing: 0.5,
@@ -195,7 +195,7 @@ const styles = StyleSheet.create({
     borderColor: colors.cardBorder,
   },
   statNumber: {
-    color: colors.primary,
+    color: colors.secondary,
     fontSize: 18,
     fontWeight: '800',
   },

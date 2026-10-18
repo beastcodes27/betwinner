@@ -75,9 +75,9 @@ export default function FollowingScreen() {
             {['Premier League (England)', 'Champions League (Europe)', 'La Liga (Spain)', 'Serie A (Italy)'].map(
               (league, idx) => (
                 <View key={idx} style={styles.leagueItem}>
-                  <Ionicons name="football-outline" size={24} color={colors.primary} />
+                  <Ionicons name="football-outline" size={24} color={colors.secondary} />
                   <Text style={styles.leagueName}>{league}</Text>
-                  <Ionicons name="checkmark-circle" size={22} color={colors.primary} />
+                  <Ionicons name="checkmark-circle" size={22} color={colors.secondary} />
                 </View>
               )
             )}
@@ -142,8 +142,8 @@ const styles = StyleSheet.create({
     borderColor: colors.cardBorder,
   },
   pillActive: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
+    backgroundColor: colors.secondary,
+    borderColor: colors.secondary,
   },
   pillText: {
     color: colors.textSecondary,
@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   pillTextActive: {
-    color: colors.background,
+    color: colors.primary,
     fontWeight: '700',
   },
   scrollContent: {
@@ -192,7 +192,7 @@ const styles = StyleSheet.create({
     borderTopColor: colors.cardBorder,
   },
   tipBadge: {
-    color: colors.primary,
+    color: colors.secondary,
     fontSize: 13,
     fontWeight: '700',
   },
@@ -255,10 +255,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: colors.primary,
+    borderColor: colors.secondary,
   },
   followingBtnText: {
-    color: colors.primary,
+    color: colors.secondary,
     fontSize: 12,
     fontWeight: '600',
   },

@@ -28,7 +28,7 @@ export default function HomeScreen() {
             <Text style={styles.bannerTitle}>Banker of the Day</Text>
             <Text style={styles.bannerOdds}>Odds: 1.85 • 88% Confidence</Text>
           </View>
-          <Ionicons name="shield-checkmark" size={44} color={colors.primary} />
+          <Ionicons name="shield-checkmark" size={44} color={colors.secondary} />
         </View>
 
         {/* Section title */}
@@ -39,7 +39,7 @@ export default function HomeScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* Placeholder match tip card */}
+        {/* Match tip card 1 */}
         <View style={styles.tipCard}>
           <View style={styles.cardHeader}>
             <Text style={styles.leagueText}>PREMIER LEAGUE • 19:30</Text>
@@ -65,12 +65,13 @@ export default function HomeScreen() {
               <Text style={styles.predictionValue}>Home Win (1)</Text>
             </View>
             <TouchableOpacity style={styles.addToSlipBtn} activeOpacity={0.7}>
-              <Ionicons name="add-circle-outline" size={18} color={colors.background} />
+              <Ionicons name="add-circle-outline" size={18} color={colors.primary} />
               <Text style={styles.addToSlipText}>Add to slip</Text>
             </TouchableOpacity>
           </View>
         </View>
 
+        {/* Match tip card 2 */}
         <View style={styles.tipCard}>
           <View style={styles.cardHeader}>
             <Text style={styles.leagueText}>LA LIGA • 21:00</Text>
@@ -96,7 +97,7 @@ export default function HomeScreen() {
               <Text style={styles.predictionValue}>Over 2.5 Goals</Text>
             </View>
             <TouchableOpacity style={styles.addToSlipBtn} activeOpacity={0.7}>
-              <Ionicons name="add-circle-outline" size={18} color={colors.background} />
+              <Ionicons name="add-circle-outline" size={18} color={colors.primary} />
               <Text style={styles.addToSlipText}>Add to slip</Text>
             </TouchableOpacity>
           </View>
@@ -121,7 +122,7 @@ const styles = StyleSheet.create({
     borderBottomColor: colors.cardBorder,
   },
   headerSub: {
-    color: colors.primary,
+    color: colors.secondary,
     fontSize: 11,
     fontWeight: '700',
     letterSpacing: 1,
@@ -149,7 +150,7 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: colors.primary,
+    backgroundColor: colors.secondary,
   },
   scrollContent: {
     padding: 16,
@@ -171,14 +172,14 @@ const styles = StyleSheet.create({
   },
   tag: {
     alignSelf: 'flex-start',
-    backgroundColor: 'rgba(0, 210, 106, 0.15)',
+    backgroundColor: colors.accentAlpha,
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 6,
     marginBottom: 6,
   },
   tagText: {
-    color: colors.primary,
+    color: colors.secondary,
     fontSize: 10,
     fontWeight: '700',
   },
@@ -204,7 +205,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   seeAllText: {
-    color: colors.primary,
+    color: colors.secondary,
     fontSize: 13,
     fontWeight: '600',
   },
@@ -228,13 +229,13 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   confidenceBadge: {
-    backgroundColor: 'rgba(0, 210, 106, 0.12)',
+    backgroundColor: colors.accentAlpha,
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 12,
   },
   confidenceText: {
-    color: colors.primary,
+    color: colors.secondary,
     fontSize: 11,
     fontWeight: '700',
   },
@@ -275,23 +276,22 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   predictionValue: {
-    color: colors.primary,
+    color: colors.secondary,
     fontSize: 14,
     fontWeight: '700',
   },
   addToSlipBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.primary,
+    backgroundColor: colors.secondary,
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 8,
     gap: 4,
   },
   addToSlipText: {
-    color: colors.background,
+    color: colors.primary,
     fontSize: 12,
     fontWeight: '700',
   },
 });
-
