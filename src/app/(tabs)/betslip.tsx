@@ -11,10 +11,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '@/constants/theme';
 import { MOCK_SLIPS, TipsterSlip } from '@/data/mockSlips';
+import { useAppUI } from '@/context/UIContext';
 
 type CategoryFilter = 'All' | 'Free' | 'Banker' | 'Goals' | 'VIP';
 
 export default function BetslipScreen() {
+  const { showToast, showPopup } = useAppUI();
   const [selectedFilter, setSelectedFilter] = useState<CategoryFilter>('All');
   const [activeSlip, setActiveSlip] = useState<TipsterSlip | null>(null);
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
@@ -25,8 +27,13 @@ export default function BetslipScreen() {
     return slip.category === selectedFilter;
   });
 
-  const handleCopyCode = (code: string) => {
+  const handleCopyCode = (code: string, bookmaker?: string) => {
     setCopiedCode(code);
+    showToast({
+      type: 'success',
+      title: 'Booking Code Copied!',
+      message: `${bookmaker ? bookmaker.toUpperCase() + ': ' : ''}${code} copied. Load it directly into your betting app!`,
+    });
     setTimeout(() => {
       setCopiedCode(null);
     }, 2500);
@@ -40,7 +47,20 @@ export default function BetslipScreen() {
           <Text style={styles.headerSubtitle}>COMMUNITY MARKETPLACE</Text>
           <Text style={styles.headerTitle}>Tipster Bet Slips</Text>
         </View>
-        <TouchableOpacity style={styles.headerActionBtn} activeOpacity={0.7}>
+        <TouchableOpacity
+          style={styles.headerActionBtn}
+          activeOpacity={0.7}
+          onPress={() =>
+            showPopup({
+              type: 'info',
+              icon: 'options-outline',
+              title: 'Filter Marketplace',
+              message:
+                'Filter tipster slips by minimum odds, bookmakers (Betika, SportyBet, 1xBet), and stake amount.',
+              primaryText: 'Close',
+            })
+          }
+        >
           <Ionicons name="filter-outline" size={20} color={colors.secondary} />
         </TouchableOpacity>
       </View>
@@ -136,7 +156,7 @@ export default function BetslipScreen() {
                   styles.bookmakerCodePill,
                   copiedCode === slip.bookingCode && styles.bookmakerCodePillCopied,
                 ]}
-                onPress={() => handleCopyCode(slip.bookingCode)}
+                onPress={() => handleCopyCode(slip.bookingCode, slip.bookmaker)}
                 activeOpacity={0.7}
               >
                 <View style={styles.bookmakerBadge}>
@@ -249,7 +269,7 @@ export default function BetslipScreen() {
               </View>
               <TouchableOpacity
                 style={[styles.copyBtn, copiedCode === activeSlip?.bookingCode && styles.copyBtnSuccess]}
-                onPress={() => activeSlip && handleCopyCode(activeSlip.bookingCode)}
+                onPress={() => activeSlip && handleCopyCode(activeSlip.bookingCode, activeSlip.bookmaker)}
                 activeOpacity={0.8}
               >
                 <Ionicons

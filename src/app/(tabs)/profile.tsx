@@ -6,11 +6,11 @@ import {
   ScrollView,
   TouchableOpacity,
   Modal,
-  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '@/constants/theme';
+import { useAppUI } from '@/context/UIContext';
 import {
   MOCK_PURCHASED_SLIPS,
   MOCK_PAYMENTS,
@@ -31,6 +31,7 @@ type ActiveModal =
 type SlipStatusFilter = 'all' | 'active' | 'won' | 'lost';
 
 export default function ProfileScreen() {
+  const { showToast, showPopup } = useAppUI();
   const [activeModal, setActiveModal] = useState<ActiveModal>(null);
   const [selectedSlip, setSelectedSlip] = useState<PurchasedSlip | null>(null);
   const [slipFilter, setSlipFilter] = useState<SlipStatusFilter>('all');
@@ -41,6 +42,11 @@ export default function ProfileScreen() {
 
   const handleCopyCode = (code: string) => {
     setCopiedCode(code);
+    showToast({
+      type: 'success',
+      title: 'Booking Code Copied!',
+      message: `${code} copied to clipboard. Load directly into your betting app!`,
+    });
     setTimeout(() => {
       setCopiedCode(null);
     }, 2500);
@@ -64,16 +70,21 @@ export default function ProfileScreen() {
   const handleConfirmLogout = () => {
     setActiveModal(null);
     setIsLoggedOut(true);
-    Alert.alert('Logged Out', 'You have been successfully logged out.');
+    showToast({
+      type: 'info',
+      title: 'Logged Out',
+      message: 'You have been successfully logged out of your session.',
+    });
   };
 
   const handleConfirmDelete = () => {
     setActiveModal(null);
     setIsAccountDeleted(true);
-    Alert.alert(
-      'Account Deleted',
-      'Your account and all associated data have been permanently deleted.'
-    );
+    showToast({
+      type: 'warning',
+      title: 'Account Deleted',
+      message: 'Your account and all associated data have been permanently erased.',
+    });
   };
 
   return (
@@ -613,7 +624,24 @@ export default function ProfileScreen() {
               <TouchableOpacity
                 style={styles.contactCard}
                 activeOpacity={0.8}
-                onPress={() => Alert.alert('WhatsApp Support', 'Connecting to WhatsApp Support (+254 700 123 456)...')}
+                onPress={() =>
+                  showPopup({
+                    title: 'WhatsApp Support',
+                    message:
+                      'Connect directly with our 24/7 dedicated support team on WhatsApp (+254 700 123 456).',
+                    type: 'success',
+                    icon: 'logo-whatsapp',
+                    primaryText: 'Open WhatsApp',
+                    secondaryText: 'Close',
+                    onConfirm: () => {
+                      showToast({
+                        type: 'success',
+                        title: 'Connecting...',
+                        message: 'Opening WhatsApp chat with customer support',
+                      });
+                    },
+                  })
+                }
               >
                 <View style={[styles.contactIconCircle, { backgroundColor: '#128C7E' }]}>
                   <Ionicons name="logo-whatsapp" size={24} color="#FFFFFF" />
@@ -625,7 +653,24 @@ export default function ProfileScreen() {
               <TouchableOpacity
                 style={styles.contactCard}
                 activeOpacity={0.8}
-                onPress={() => Alert.alert('Email Support', 'Drafting email to support@betwinner.app')}
+                onPress={() =>
+                  showPopup({
+                    title: 'Email Support',
+                    message:
+                      'Send an inquiry to support@betwinner.app. Our support team typically responds within 15 minutes.',
+                    type: 'info',
+                    icon: 'mail',
+                    primaryText: 'Compose Email',
+                    secondaryText: 'Close',
+                    onConfirm: () => {
+                      showToast({
+                        type: 'info',
+                        title: 'Email Drafted',
+                        message: 'Opening mail client for support@betwinner.app',
+                      });
+                    },
+                  })
+                }
               >
                 <View style={[styles.contactIconCircle, { backgroundColor: '#1E40AF' }]}>
                   <Ionicons name="mail" size={22} color="#FFFFFF" />
@@ -637,7 +682,24 @@ export default function ProfileScreen() {
               <TouchableOpacity
                 style={styles.contactCard}
                 activeOpacity={0.8}
-                onPress={() => Alert.alert('Helpline', 'Calling Toll-Free Hotline: 0800 720 000')}
+                onPress={() =>
+                  showPopup({
+                    title: 'Toll-Free Helpline',
+                    message:
+                      'Call our customer care hotline at 0800 720 000. Free of charge across all regional mobile networks.',
+                    type: 'info',
+                    icon: 'call',
+                    primaryText: 'Call Now',
+                    secondaryText: 'Cancel',
+                    onConfirm: () => {
+                      showToast({
+                        type: 'info',
+                        title: 'Dialing Hotline...',
+                        message: 'Calling toll-free helpline: 0800 720 000',
+                      });
+                    },
+                  })
+                }
               >
                 <View style={[styles.contactIconCircle, { backgroundColor: '#374151' }]}>
                   <Ionicons name="call" size={22} color={colors.secondary} />

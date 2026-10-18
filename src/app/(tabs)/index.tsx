@@ -6,16 +6,17 @@ import {
   ScrollView,
   TouchableOpacity,
   TextInput,
-  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '@/constants/theme';
 import { HOME_ADS, ALL_TIPSTERS, FollowedTipster } from '@/data/mockSlips';
+import { useAppUI } from '@/context/UIContext';
 
 type TipsterFilterChip = 'all' | 'high_win' | 'top_rated' | 'vip';
 
 export default function HomeScreen() {
+  const { showToast, showPopup } = useAppUI();
   const [currentAdIndex, setCurrentAdIndex] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedChip, setSelectedChip] = useState<TipsterFilterChip>('all');
@@ -43,6 +44,11 @@ export default function HomeScreen() {
       return updated;
     });
     setUserVote(option);
+    showToast({
+      type: 'success',
+      title: 'Prediction Vote Recorded! 🗳️',
+      message: `You voted for ${option === '1' ? 'Arsenal (1)' : option === 'X' ? 'Draw (X)' : 'Chelsea (2)'}. View live percentages above!`,
+    });
   };
 
   const totalVotes = voteCounts['1'] + voteCounts['X'] + voteCounts['2'];
@@ -61,17 +67,36 @@ export default function HomeScreen() {
   };
 
   const handleToggleFollow = (id: string) => {
+    const target = tipsters.find((t) => t.id === id);
+    const isNowFollowing = !target?.isFollowing;
     setTipsters((prev) =>
-      prev.map((t) => (t.id === id ? { ...t, isFollowing: !t.isFollowing } : t))
+      prev.map((t) => (t.id === id ? { ...t, isFollowing: isNowFollowing } : t))
     );
+    if (target) {
+      showToast({
+        type: isNowFollowing ? 'success' : 'info',
+        title: isNowFollowing ? `Following ${target.name}` : `Unfollowed ${target.name}`,
+        message: isNowFollowing
+          ? 'You will now receive instant alerts when they post new slips.'
+          : 'You will no longer receive notifications for this tipster.',
+      });
+    }
   };
 
   const handleToggleAddToSlip = (id: string) => {
+    const willAdd = !addedSlips.includes(id);
     if (addedSlips.includes(id)) {
       setAddedSlips((prev) => prev.filter((item) => item !== id));
     } else {
       setAddedSlips((prev) => [...prev, id]);
     }
+    showToast({
+      type: willAdd ? 'success' : 'info',
+      title: willAdd ? 'Added to Betslip' : 'Removed from Betslip',
+      message: willAdd
+        ? 'Selection added to your active betslip. Go to Betslip tab to stake.'
+        : 'Selection removed from your betslip.',
+    });
   };
 
   // Filtered tipsters based on search query and chip filter
@@ -111,7 +136,16 @@ export default function HomeScreen() {
         <TouchableOpacity
           style={styles.notificationBtn}
           activeOpacity={0.7}
-          onPress={() => Alert.alert('Notifications', 'You have 3 new tip alerts from followed tipsters.')}
+          onPress={() =>
+            showPopup({
+              type: 'info',
+              icon: 'notifications',
+              title: 'Tipster Activity Alerts',
+              message:
+                'You have 3 new winning bet slips published today by Captain Odds and Sniper Bets. Check your Following tab to view details.',
+              primaryText: 'Got It',
+            })
+          }
         >
           <Ionicons name="notifications-outline" size={22} color={colors.text} />
           <View style={styles.badgeDot} />
@@ -180,10 +214,21 @@ export default function HomeScreen() {
               style={styles.adCtaBtn}
               activeOpacity={0.8}
               onPress={() =>
-                Alert.alert(
-                  currentAd.title,
-                  `${currentAd.subtitle}\n\nPromo code ${currentAd.promoCode || 'AUTO'} applied to your account!`
-                )
+                showPopup({
+                  type: 'success',
+                  icon: 'sparkles',
+                  title: currentAd.title,
+                  message: `${currentAd.subtitle}\n\nPromo code ${currentAd.promoCode || 'AUTOMATIC'} has been credited to your BetWinner wallet!`,
+                  primaryText: 'Claim Bonus',
+                  secondaryText: 'Close',
+                  onConfirm: () => {
+                    showToast({
+                      type: 'success',
+                      title: 'Promo Claimed Successfully!',
+                      message: `${currentAd.badge} bonus active on your next betslip purchase.`,
+                    });
+                  },
+                })
               }
             >
               <Text style={styles.adCtaText}>{currentAd.ctaText}</Text>

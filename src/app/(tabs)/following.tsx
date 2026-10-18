@@ -15,30 +15,59 @@ import {
   FollowedTipster,
   TipsterSlip,
 } from '@/data/mockSlips';
+import { useAppUI } from '@/context/UIContext';
 
 export default function FollowingScreen() {
+  const { showToast } = useAppUI();
   const [tipsters, setTipsters] = useState<FollowedTipster[]>(FOLLOWED_TIPSTERS);
   const [activeSlip, setActiveSlip] = useState<TipsterSlip | null>(null);
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
 
   // Toggle follow status
   const handleToggleFollow = (id: string) => {
+    const target = tipsters.find((t) => t.id === id);
+    const isNowFollowing = !target?.isFollowing;
     setTipsters((prev) =>
-      prev.map((t) => (t.id === id ? { ...t, isFollowing: !t.isFollowing } : t))
+      prev.map((t) => (t.id === id ? { ...t, isFollowing: isNowFollowing } : t))
     );
+    if (target) {
+      showToast({
+        type: isNowFollowing ? 'success' : 'info',
+        title: isNowFollowing ? `Following ${target.name}` : `Unfollowed ${target.name}`,
+        message: isNowFollowing
+          ? 'You will now receive notifications when this tipster posts slips.'
+          : 'You will no longer receive notifications for this tipster.',
+      });
+    }
   };
 
   // Toggle notifications for a specific tipster
   const handleToggleNotifications = (id: string) => {
+    const target = tipsters.find((t) => t.id === id);
+    const isNowEnabled = !target?.notificationsEnabled;
     setTipsters((prev) =>
       prev.map((t) =>
-        t.id === id ? { ...t, notificationsEnabled: !t.notificationsEnabled } : t
+        t.id === id ? { ...t, notificationsEnabled: isNowEnabled } : t
       )
     );
+    if (target) {
+      showToast({
+        type: isNowEnabled ? 'success' : 'info',
+        title: isNowEnabled ? 'Alerts Activated' : 'Alerts Muted',
+        message: isNowEnabled
+          ? `Instant notifications on for ${target.name}.`
+          : `Notifications paused for ${target.name}.`,
+      });
+    }
   };
 
-  const handleCopyCode = (code: string) => {
+  const handleCopyCode = (code: string, bookmaker?: string) => {
     setCopiedCode(code);
+    showToast({
+      type: 'success',
+      title: 'Booking Code Copied!',
+      message: `${bookmaker ? bookmaker.toUpperCase() + ': ' : ''}${code} copied to clipboard.`,
+    });
     setTimeout(() => {
       setCopiedCode(null);
     }, 2500);
@@ -287,7 +316,7 @@ export default function FollowingScreen() {
               </View>
               <TouchableOpacity
                 style={[styles.copyBtn, copiedCode === activeSlip?.bookingCode && styles.copyBtnSuccess]}
-                onPress={() => activeSlip && handleCopyCode(activeSlip.bookingCode)}
+                onPress={() => activeSlip && handleCopyCode(activeSlip.bookingCode, activeSlip.bookmaker)}
                 activeOpacity={0.8}
               >
                 <Ionicons
