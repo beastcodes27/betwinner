@@ -464,7 +464,7 @@ const styles = StyleSheet.create({
     width: 34,
     height: 34,
     borderRadius: 17,
-    backgroundColor: '#0F1A34',
+    backgroundColor: colors.cardInner,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 8,
@@ -480,7 +480,7 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   followingBtnActive: {
-    backgroundColor: '#0F1A34',
+    backgroundColor: colors.cardInner,
     borderWidth: 1,
     borderColor: colors.secondary,
   },
@@ -534,7 +534,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   slipsBadge: {
-    backgroundColor: '#0F1A34',
+    backgroundColor: colors.cardInner,
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 6,
@@ -557,7 +557,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   latestSlipBox: {
-    backgroundColor: '#0F1A34',
+    backgroundColor: colors.cardInner,
     borderRadius: 12,
     padding: 12,
     borderWidth: 1,
@@ -641,7 +641,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   modalContent: {
-    backgroundColor: '#111D3B',
+    backgroundColor: colors.card,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     padding: 20,

@@ -430,7 +430,7 @@ const styles = StyleSheet.create({
   },
   metricsContainer: {
     flexDirection: 'row',
-    backgroundColor: '#0F1A34',
+    backgroundColor: colors.cardInner,
     borderRadius: 12,
     padding: 12,
     marginBottom: 14,
@@ -551,7 +551,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   modalContent: {
-    backgroundColor: '#111D3B',
+    backgroundColor: colors.card,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     padding: 20,
