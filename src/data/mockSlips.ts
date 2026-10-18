@@ -29,6 +29,7 @@ export interface TipsterSlip {
   amount: string;
   isFree: boolean;
   confidence: number;
+  bookmaker: string;
   bookingCode: string;
   selections: MatchSelection[];
 }
@@ -53,7 +54,8 @@ export const MOCK_SLIPS: TipsterSlip[] = [
     amount: 'Free',
     isFree: true,
     confidence: 89,
-    bookingCode: 'BW-94821',
+    bookmaker: 'Betika',
+    bookingCode: 'BTK-94821',
     selections: [
       {
         id: 's1-1',
@@ -112,7 +114,8 @@ export const MOCK_SLIPS: TipsterSlip[] = [
     amount: 'KES 50',
     isFree: false,
     confidence: 76,
-    bookingCode: 'BW-38194',
+    bookmaker: 'SportyBet',
+    bookingCode: 'SB-38194',
     selections: [
       {
         id: 's2-1',
@@ -180,7 +183,8 @@ export const MOCK_SLIPS: TipsterSlip[] = [
     amount: 'Free',
     isFree: true,
     confidence: 93,
-    bookingCode: 'BW-11209',
+    bookmaker: 'Betika',
+    bookingCode: 'BTK-11209',
     selections: [
       {
         id: 's3-1',
@@ -221,7 +225,8 @@ export const MOCK_SLIPS: TipsterSlip[] = [
     amount: 'KES 100',
     isFree: false,
     confidence: 72,
-    bookingCode: 'BW-88741',
+    bookmaker: '1xBet',
+    bookingCode: '1X-88741',
     selections: [
       {
         id: 's4-1',
@@ -280,4 +285,104 @@ export const MOCK_SLIPS: TipsterSlip[] = [
     ],
   },
 ];
+
+export interface FollowedTipster {
+  id: string;
+  name: string;
+  handle: string;
+  avatarBg: string;
+  winRate: string;
+  badge: string;
+  followers: string;
+  verified: boolean;
+  specialty: string;
+  streak: string;
+  activeSlipsCount: number;
+  latestSlip?: TipsterSlip;
+  notificationsEnabled: boolean;
+  isFollowing: boolean;
+}
+
+export const FOLLOWED_TIPSTERS: FollowedTipster[] = [
+  {
+    id: 'tipster-1',
+    name: 'Captain Odds',
+    handle: '@captain_odds',
+    avatarBg: '#3B82F6',
+    winRate: '86% Win Rate',
+    badge: 'TOP TIPSTER 🔥',
+    followers: '24.5k',
+    verified: true,
+    specialty: 'European Leagues & Banker Combos',
+    streak: '7W Streak',
+    activeSlipsCount: 3,
+    latestSlip: MOCK_SLIPS[0],
+    notificationsEnabled: true,
+    isFollowing: true,
+  },
+  {
+    id: 'tipster-2',
+    name: 'Sniper Bets',
+    handle: '@sniper_bets',
+    avatarBg: '#EC4899',
+    winRate: '91% Win Rate',
+    badge: 'STREAK 9W 🔥',
+    followers: '31.8k',
+    verified: true,
+    specialty: 'High-Confidence 2-Odds Doubles',
+    streak: '9W Streak',
+    activeSlipsCount: 2,
+    latestSlip: MOCK_SLIPS[2],
+    notificationsEnabled: true,
+    isFollowing: true,
+  },
+  {
+    id: 'tipster-3',
+    name: 'Goal Master AI',
+    handle: '@goal_master',
+    avatarBg: '#8B5CF6',
+    winRate: '82% Win Rate',
+    badge: 'AI PREDICTOR 🤖',
+    followers: '18.2k',
+    verified: true,
+    specialty: 'Over 2.5 & Both Teams to Score',
+    streak: '5W Streak',
+    activeSlipsCount: 4,
+    latestSlip: MOCK_SLIPS[1],
+    notificationsEnabled: false,
+    isFollowing: true,
+  },
+  {
+    id: 'tipster-4',
+    name: 'VIP Elite Club',
+    handle: '@vip_elite',
+    avatarBg: '#F59E0B',
+    winRate: '88% Win Rate',
+    badge: 'EXCLUSIVE VIP 👑',
+    followers: '45.1k',
+    verified: true,
+    specialty: 'Weekend High Odds Accumulators',
+    streak: '12W Streak',
+    activeSlipsCount: 1,
+    latestSlip: MOCK_SLIPS[3],
+    notificationsEnabled: true,
+    isFollowing: true,
+  },
+  {
+    id: 'tipster-5',
+    name: 'Tactical Draw Pro',
+    handle: '@draw_tactics',
+    avatarBg: '#10B981',
+    winRate: '75% Win Rate',
+    badge: 'DRAW SPECIALIST 🎯',
+    followers: '14.3k',
+    verified: false,
+    specialty: 'System Bets & High Value Single Picks',
+    streak: '4W Streak',
+    activeSlipsCount: 2,
+    notificationsEnabled: false,
+    isFollowing: true,
+  },
+];
+
 
