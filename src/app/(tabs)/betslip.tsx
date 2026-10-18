@@ -12,6 +12,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { colors } from '@/constants/theme';
 import { MOCK_SLIPS, TipsterSlip } from '@/data/mockSlips';
 import { useAppUI } from '@/context/UIContext';
+import BookmakerLogo from '@/components/BookmakerLogo';
 
 type CategoryFilter = 'All' | 'Free' | 'Banker' | 'Goals' | 'VIP';
 
@@ -292,21 +293,7 @@ export default function BetslipScreen() {
                     onPress={() => setActiveSlip(slip)}
                     activeOpacity={0.7}
                   >
-                    <View
-                      style={[
-                        styles.bookmakerBadge,
-                        !unlocked && !slip.isFree && styles.bookmakerBadgeVip,
-                      ]}
-                    >
-                      <Text
-                        style={[
-                          styles.bookmakerBadgeText,
-                          !unlocked && !slip.isFree && styles.bookmakerBadgeTextVip,
-                        ]}
-                      >
-                        {slip.bookmaker.toUpperCase()}
-                      </Text>
-                    </View>
+                    <BookmakerLogo name={slip.bookmaker} size="sm" />
                     <View style={styles.codeRow}>
                       {unlocked ? (
                         <>
@@ -530,9 +517,7 @@ export default function BetslipScreen() {
                       <View style={styles.codeInfo}>
                         <View style={styles.modalBookmakerRow}>
                           <Text style={styles.codeLabel}>BOOKING CODE</Text>
-                          <View style={styles.modalBookmakerBadge}>
-                            <Text style={styles.modalBookmakerText}>{activeSlip.bookmaker.toUpperCase()}</Text>
-                          </View>
+                          <BookmakerLogo name={activeSlip.bookmaker} size="sm" />
                         </View>
                         <Text style={styles.codeValue}>{activeSlip.bookingCode}</Text>
                       </View>
@@ -559,9 +544,7 @@ export default function BetslipScreen() {
                       <View style={styles.codeInfo}>
                         <View style={styles.modalBookmakerRow}>
                           <Text style={styles.codeLabel}>BOOKING CODE</Text>
-                          <View style={styles.modalBookmakerBadgeVip}>
-                            <Text style={styles.modalBookmakerTextVip}>{activeSlip.bookmaker.toUpperCase()}</Text>
-                          </View>
+                          <BookmakerLogo name={activeSlip.bookmaker} size="sm" />
                         </View>
                         <Text style={styles.codeValueLocked}>•••••••• (VIP Subscription)</Text>
                       </View>
@@ -1025,27 +1008,7 @@ const styles = StyleSheet.create({
     borderColor: colors.badgeGreenBorder,
     backgroundColor: colors.badgeGreenBg,
   },
-  bookmakerBadge: {
-    backgroundColor: colors.badgeGreenBg,
-    borderWidth: 1,
-    borderColor: colors.badgeGreenBorder,
-    paddingHorizontal: 5,
-    paddingVertical: 2,
-    borderRadius: 4,
-  },
-  bookmakerBadgeVip: {
-    backgroundColor: colors.badgeGoldBg,
-    borderColor: colors.badgeGoldBorder,
-  },
-  bookmakerBadgeText: {
-    color: colors.secondary,
-    fontSize: 9,
-    fontWeight: '900',
-    letterSpacing: 0.6,
-  },
-  bookmakerBadgeTextVip: {
-    color: colors.gold,
-  },
+
   codeRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -1441,34 +1404,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 6,
   },
-  modalBookmakerBadge: {
-    backgroundColor: colors.badgeGreenBg,
-    borderWidth: 1,
-    borderColor: colors.badgeGreenBorder,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
-  },
-  modalBookmakerText: {
-    color: colors.secondary,
-    fontSize: 9,
-    fontWeight: '900',
-    letterSpacing: 0.6,
-  },
-  modalBookmakerBadgeVip: {
-    backgroundColor: colors.badgeGoldBg,
-    borderWidth: 1,
-    borderColor: colors.badgeGoldBorder,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
-  },
-  modalBookmakerTextVip: {
-    color: colors.gold,
-    fontSize: 9,
-    fontWeight: '900',
-    letterSpacing: 0.6,
-  },
+
   codeLabel: {
     color: colors.textMuted,
     fontSize: 10,

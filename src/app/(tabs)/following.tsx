@@ -16,6 +16,7 @@ import {
   TipsterSlip,
 } from '@/data/mockSlips';
 import { useAppUI } from '@/context/UIContext';
+import BookmakerLogo from '@/components/BookmakerLogo';
 
 export default function FollowingScreen() {
   const { showToast } = useAppUI();
@@ -205,9 +206,13 @@ export default function FollowingScreen() {
                     <Text style={styles.slipTitleText} numberOfLines={1}>
                       {tipster.latestSlip.title}
                     </Text>
-                    <Text style={styles.slipSubInfo}>
-                      {tipster.latestSlip.matchesCount} Matches • {tipster.latestSlip.bookmaker} • {tipster.latestSlip.amount}
-                    </Text>
+                    <View style={styles.slipSubInfoRow}>
+                      <BookmakerLogo name={tipster.latestSlip.bookmaker} size="xs" />
+                      <Text style={styles.slipSubInfoDot}>•</Text>
+                      <Text style={styles.slipSubInfo}>
+                        {tipster.latestSlip.matchesCount} Matches • {tipster.latestSlip.amount}
+                      </Text>
+                    </View>
                   </View>
 
                   <View style={styles.oddsBox}>
@@ -308,9 +313,7 @@ export default function FollowingScreen() {
               <View style={styles.codeInfo}>
                 <View style={styles.modalBookmakerRow}>
                   <Text style={styles.codeLabel}>BOOKING CODE</Text>
-                  <View style={styles.modalBookmakerBadge}>
-                    <Text style={styles.modalBookmakerText}>{activeSlip?.bookmaker.toUpperCase()}</Text>
-                  </View>
+                  {activeSlip && <BookmakerLogo name={activeSlip.bookmaker} size="sm" />}
                 </View>
                 <Text style={styles.codeValue}>{activeSlip?.bookingCode}</Text>
               </View>
@@ -632,10 +635,19 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '700',
   },
+  slipSubInfoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 4,
+    gap: 6,
+  },
+  slipSubInfoDot: {
+    color: colors.textMuted,
+    fontSize: 11,
+  },
   slipSubInfo: {
     color: colors.textSecondary,
     fontSize: 12,
-    marginTop: 2,
   },
   oddsBox: {
     alignItems: 'flex-end',
@@ -832,20 +844,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 6,
   },
-  modalBookmakerBadge: {
-    backgroundColor: colors.badgeGreenBg,
-    borderWidth: 1,
-    borderColor: colors.badgeGreenBorder,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
-  },
-  modalBookmakerText: {
-    color: colors.secondary,
-    fontSize: 9,
-    fontWeight: '900',
-    letterSpacing: 0.6,
-  },
+
   codeLabel: {
     color: colors.textMuted,
     fontSize: 10,

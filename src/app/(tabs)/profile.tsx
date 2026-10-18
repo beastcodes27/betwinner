@@ -11,6 +11,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '@/constants/theme';
 import { useAppUI } from '@/context/UIContext';
+import BookmakerLogo from '@/components/BookmakerLogo';
 import {
   MOCK_PURCHASED_SLIPS,
   MOCK_PAYMENTS,
@@ -434,9 +435,7 @@ export default function ProfileScreen() {
 
                 {/* Bookmaker & Booking Code Pill */}
                 <View style={styles.codeRowSection}>
-                  <View style={styles.bookmakerTag}>
-                    <Text style={styles.bookmakerTagText}>{slip.bookmaker.toUpperCase()}</Text>
-                  </View>
+                  <BookmakerLogo name={slip.bookmaker} size="sm" />
                   <TouchableOpacity
                     style={[
                       styles.codePill,
@@ -1405,20 +1404,7 @@ const styles = StyleSheet.create({
     gap: 8,
     marginBottom: 12,
   },
-  bookmakerTag: {
-    backgroundColor: colors.badgeGreenBg,
-    borderWidth: 1,
-    borderColor: colors.badgeGreenBorder,
-    paddingHorizontal: 8,
-    paddingVertical: 6,
-    borderRadius: 8,
-  },
-  bookmakerTagText: {
-    color: colors.secondary,
-    fontSize: 11,
-    fontWeight: '900',
-    letterSpacing: 0.6,
-  },
+
   codePill: {
     flex: 1,
     flexDirection: 'row',
