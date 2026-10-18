@@ -210,7 +210,7 @@ export default function HomeScreen() {
       {/* Top Header */}
       <View style={styles.header}>
         <View>
-          <Text style={styles.headerSub}>KENYA&apos;S #1 TIPSTER NETWORK</Text>
+          <Text style={styles.headerSub}>TANZANIA&apos;S #1 TIPSTER NETWORK</Text>
           <Text style={styles.headerTitle}>BETWINNER</Text>
         </View>
         <TouchableOpacity

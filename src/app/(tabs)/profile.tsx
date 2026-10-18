@@ -118,7 +118,7 @@ export default function ProfileScreen() {
               <Ionicons name="checkmark-circle" size={16} color={colors.secondary} />
             </View>
             <Text style={styles.userEmail}>
-              {isAccountDeleted ? 'No active account' : '+254 712 *** 890 • alex.bettor@gmail.com'}
+              {isAccountDeleted ? 'No active account' : '+255 712 *** 890 • alex.bettor@gmail.com'}
             </Text>
             <View style={styles.walletBox}>
               <View style={styles.walletLeft}>
@@ -126,7 +126,7 @@ export default function ProfileScreen() {
                 <Text style={styles.walletLabel}>Wallet Balance:</Text>
               </View>
               <Text style={styles.walletAmount}>
-                KES {isAccountDeleted ? '0' : walletBalance.toLocaleString()}
+                Tshs {isAccountDeleted ? '0' : walletBalance.toLocaleString()}
               </Text>
             </View>
           </View>
@@ -189,7 +189,7 @@ export default function ProfileScreen() {
               <Text style={styles.menuSubtitle}>M-Pesa receipts, wallet deposits & slip purchases</Text>
             </View>
             <View style={styles.badgePillGold}>
-              <Text style={styles.badgePillGoldText}>KES {totalSpent.toLocaleString()} Spent</Text>
+              <Text style={styles.badgePillGoldText}>Tshs {totalSpent.toLocaleString()} Spent</Text>
             </View>
             <Ionicons name="chevron-forward" size={18} color={colors.textMuted} />
           </TouchableOpacity>
@@ -533,21 +533,21 @@ export default function ProfileScreen() {
             <View style={styles.summaryBox}>
               <Text style={styles.summaryLabel}>TOTAL DEPOSITS</Text>
               <Text style={[styles.summaryAmount, { color: colors.secondary }]}>
-                KES {totalDeposited.toLocaleString()}
+                Tshs {totalDeposited.toLocaleString()}
               </Text>
             </View>
             <View style={styles.summaryDivider} />
             <View style={styles.summaryBox}>
               <Text style={styles.summaryLabel}>SLIPS PURCHASED</Text>
               <Text style={[styles.summaryAmount, { color: colors.gold }]}>
-                KES {totalSpent.toLocaleString()}
+                Tshs {totalSpent.toLocaleString()}
               </Text>
             </View>
             <View style={styles.summaryDivider} />
             <View style={styles.summaryBox}>
               <Text style={styles.summaryLabel}>BALANCE</Text>
               <Text style={styles.summaryAmount}>
-                KES {walletBalance.toLocaleString()}
+                Tshs {walletBalance.toLocaleString()}
               </Text>
             </View>
           </View>
@@ -580,7 +580,7 @@ export default function ProfileScreen() {
                         payment.amount > 0 ? styles.txAmountPositive : styles.txAmountNegative,
                       ]}
                     >
-                      {payment.amount > 0 ? `+KES ${payment.amount.toLocaleString()}` : `-KES ${Math.abs(payment.amount).toLocaleString()}`}
+                      {payment.amount > 0 ? `+Tshs ${payment.amount.toLocaleString()}` : `-Tshs ${Math.abs(payment.amount).toLocaleString()}`}
                     </Text>
                     <View style={styles.txStatusBadge}>
                       <Text style={styles.txStatusText}>{payment.status.toUpperCase()}</Text>
@@ -628,7 +628,7 @@ export default function ProfileScreen() {
                   showPopup({
                     title: 'WhatsApp Support',
                     message:
-                      'Connect directly with our 24/7 dedicated support team on WhatsApp (+254 700 123 456).',
+                      'Connect directly with our 24/7 dedicated support team on WhatsApp (+255 700 123 456).',
                     type: 'success',
                     icon: 'logo-whatsapp',
                     primaryText: 'Open WhatsApp',
@@ -872,7 +872,7 @@ export default function ProfileScreen() {
             <Text style={styles.deleteModalTitle}>Delete Account?</Text>
             <Text style={styles.deleteModalText}>
               This action is permanent and cannot be undone. All your purchased slips (
-              {MOCK_PURCHASED_SLIPS.length}), wallet balance (KES {walletBalance}), and followed
+              {MOCK_PURCHASED_SLIPS.length}), wallet balance (Tshs {walletBalance.toLocaleString()}), and followed
               tipsters will be permanently erased.
             </Text>
 
