@@ -1,112 +1,308 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Modal,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '@/constants/theme';
+import {
+  FOLLOWED_TIPSTERS,
+  FollowedTipster,
+  TipsterSlip,
+} from '@/data/mockSlips';
 
 export default function FollowingScreen() {
-  const [activeTab, setActiveTab] = useState<'tips' | 'leagues' | 'tipsters'>('tips');
+  const [tipsters, setTipsters] = useState<FollowedTipster[]>(FOLLOWED_TIPSTERS);
+  const [activeSlip, setActiveSlip] = useState<TipsterSlip | null>(null);
+  const [copiedCode, setCopiedCode] = useState<string | null>(null);
+
+  // Toggle follow status
+  const handleToggleFollow = (id: string) => {
+    setTipsters((prev) =>
+      prev.map((t) => (t.id === id ? { ...t, isFollowing: !t.isFollowing } : t))
+    );
+  };
+
+  // Toggle notifications for a specific tipster
+  const handleToggleNotifications = (id: string) => {
+    setTipsters((prev) =>
+      prev.map((t) =>
+        t.id === id ? { ...t, notificationsEnabled: !t.notificationsEnabled } : t
+      )
+    );
+  };
+
+  const handleCopyCode = (code: string) => {
+    setCopiedCode(code);
+    setTimeout(() => {
+      setCopiedCode(null);
+    }, 2500);
+  };
+
+  const followingCount = tipsters.filter((t) => t.isFollowing).length;
 
   return (
     <SafeAreaView style={styles.safeArea}>
+      {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Following</Text>
-      </View>
-
-      {/* Pill switcher */}
-      <View style={styles.pillContainer}>
-        <TouchableOpacity
-          style={[styles.pill, activeTab === 'tips' && styles.pillActive]}
-          onPress={() => setActiveTab('tips')}
-        >
-          <Text style={[styles.pillText, activeTab === 'tips' && styles.pillTextActive]}>
-            Saved Tips
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.pill, activeTab === 'leagues' && styles.pillActive]}
-          onPress={() => setActiveTab('leagues')}
-        >
-          <Text style={[styles.pillText, activeTab === 'leagues' && styles.pillTextActive]}>
-            Leagues
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.pill, activeTab === 'tipsters' && styles.pillActive]}
-          onPress={() => setActiveTab('tipsters')}
-        >
-          <Text style={[styles.pillText, activeTab === 'tipsters' && styles.pillTextActive]}>
-            Tipsters
-          </Text>
-        </TouchableOpacity>
+        <View>
+          <Text style={styles.headerSubtitle}>YOUR EXPERT FEED</Text>
+          <Text style={styles.headerTitle}>Followed Tipsters</Text>
+        </View>
+        <View style={styles.headerBadge}>
+          <Text style={styles.headerBadgeText}>{followingCount} Followed</Text>
+        </View>
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        {activeTab === 'tips' && (
-          <View>
-            <View style={styles.followingCard}>
-              <View style={styles.cardHeader}>
-                <Text style={styles.leagueText}>PREMIER LEAGUE • TODAY 19:30</Text>
-                <Ionicons name="star" size={18} color={colors.secondary} />
-              </View>
-              <Text style={styles.matchTitle}>Arsenal vs Chelsea</Text>
-              <View style={styles.tipRow}>
-                <Text style={styles.tipBadge}>Tip: Arsenal to Win</Text>
-                <Text style={styles.oddsText}>Odds: 1.65</Text>
-              </View>
-            </View>
-
-            <View style={styles.followingCard}>
-              <View style={styles.cardHeader}>
-                <Text style={styles.leagueText}>SERIE A • TOMORROW 20:45</Text>
-                <Ionicons name="star" size={18} color={colors.secondary} />
-              </View>
-              <Text style={styles.matchTitle}>Inter vs Juventus</Text>
-              <View style={styles.tipRow}>
-                <Text style={styles.tipBadge}>Tip: Both Teams to Score (BTTS)</Text>
-                <Text style={styles.oddsText}>Odds: 1.80</Text>
-              </View>
-            </View>
+        {/* Quick Stats Overview */}
+        <View style={styles.statsBanner}>
+          <View style={styles.statBox}>
+            <Text style={styles.statNumber}>{followingCount}</Text>
+            <Text style={styles.statLabel}>Following</Text>
           </View>
-        )}
-
-        {activeTab === 'leagues' && (
-          <View>
-            {['Premier League (England)', 'Champions League (Europe)', 'La Liga (Spain)', 'Serie A (Italy)'].map(
-              (league, idx) => (
-                <View key={idx} style={styles.leagueItem}>
-                  <Ionicons name="football-outline" size={24} color={colors.secondary} />
-                  <Text style={styles.leagueName}>{league}</Text>
-                  <Ionicons name="checkmark-circle" size={22} color={colors.secondary} />
-                </View>
-              )
-            )}
+          <View style={styles.statDivider} />
+          <View style={styles.statBox}>
+            <Text style={styles.statHighlight}>84.4%</Text>
+            <Text style={styles.statLabel}>Avg. Win Rate</Text>
           </View>
-        )}
+          <View style={styles.statDivider} />
+          <View style={styles.statBox}>
+            <Text style={styles.statNumber}>12</Text>
+            <Text style={styles.statLabel}>Active Slips</Text>
+          </View>
+        </View>
 
-        {activeTab === 'tipsters' && (
-          <View>
-            {[
-              { name: 'Alex Banker', rate: '84% Win Rate', followers: '12.4k' },
-              { name: 'Goal Master', rate: '79% Win Rate', followers: '8.9k' },
-              { name: 'High Odds Daily', rate: '68% Win Rate', followers: '15.1k' },
-            ].map((tipster, idx) => (
-              <View key={idx} style={styles.tipsterCard}>
-                <View style={styles.avatar}>
-                  <Ionicons name="person" size={20} color={colors.text} />
-                </View>
-                <View style={styles.tipsterInfo}>
+        {/* Section Title */}
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionTitle}>Tipsters You Follow</Text>
+          <Text style={styles.sectionCount}>{followingCount} Profiles</Text>
+        </View>
+
+        {/* Tipster Cards List */}
+        {tipsters.map((tipster) => (
+          <View key={tipster.id} style={styles.tipsterCard}>
+            {/* Top Row: Avatar, Name, Follow & Notification buttons */}
+            <View style={styles.cardTopRow}>
+              <View style={[styles.avatar, { backgroundColor: tipster.avatarBg }]}>
+                <Text style={styles.avatarText}>{tipster.name.charAt(0)}</Text>
+                <View style={styles.onlinePulse} />
+              </View>
+
+              <View style={styles.profileInfo}>
+                <View style={styles.nameRow}>
                   <Text style={styles.tipsterName}>{tipster.name}</Text>
-                  <Text style={styles.tipsterRate}>{tipster.rate} • {tipster.followers} followers</Text>
+                  {tipster.verified && (
+                    <Ionicons name="checkmark-circle" size={16} color={colors.secondary} />
+                  )}
                 </View>
-                <TouchableOpacity style={styles.followingBtn}>
-                  <Text style={styles.followingBtnText}>Following</Text>
+                <Text style={styles.tipsterHandle}>
+                  {tipster.handle} • {tipster.followers} followers
+                </Text>
+              </View>
+
+              {/* Notification Bell */}
+              <TouchableOpacity
+                style={styles.notifBtn}
+                onPress={() => handleToggleNotifications(tipster.id)}
+                activeOpacity={0.7}
+              >
+                <Ionicons
+                  name={tipster.notificationsEnabled ? 'notifications' : 'notifications-off-outline'}
+                  size={18}
+                  color={tipster.notificationsEnabled ? colors.secondary : colors.textMuted}
+                />
+              </TouchableOpacity>
+
+              {/* Follow / Unfollow Button */}
+              <TouchableOpacity
+                style={[
+                  styles.followActionBtn,
+                  tipster.isFollowing ? styles.followingBtnActive : styles.followBtn,
+                ]}
+                onPress={() => handleToggleFollow(tipster.id)}
+                activeOpacity={0.8}
+              >
+                {tipster.isFollowing ? (
+                  <>
+                    <Ionicons name="checkmark" size={14} color={colors.secondary} />
+                    <Text style={styles.followingBtnText}>Following</Text>
+                  </>
+                ) : (
+                  <>
+                    <Ionicons name="add" size={14} color={colors.primary} />
+                    <Text style={styles.followBtnText}>Follow</Text>
+                  </>
+                )}
+              </TouchableOpacity>
+            </View>
+
+            {/* Performance Tags: Win Rate, Streak, Specialty */}
+            <View style={styles.tagsRow}>
+              <View style={styles.winRateBadge}>
+                <Ionicons name="trending-up" size={13} color={colors.secondary} />
+                <Text style={styles.winRateText}>{tipster.winRate}</Text>
+              </View>
+              <View style={styles.streakBadge}>
+                <Text style={styles.streakText}>{tipster.streak}</Text>
+              </View>
+              <View style={styles.slipsBadge}>
+                <Text style={styles.slipsBadgeText}>{tipster.activeSlipsCount} Slips Live</Text>
+              </View>
+            </View>
+
+            <Text style={styles.specialtyText}>
+              <Text style={styles.specialtyLabel}>Specialty: </Text>
+              {tipster.specialty}
+            </Text>
+
+            {/* Latest Published Slip Snippet */}
+            {tipster.latestSlip && (
+              <View style={styles.latestSlipBox}>
+                <View style={styles.latestSlipHeader}>
+                  <View style={styles.latestSlipTag}>
+                    <Text style={styles.latestSlipTagText}>LATEST BETSLIP</Text>
+                  </View>
+                  <Text style={styles.validityText}>{tipster.latestSlip.validityTime}</Text>
+                </View>
+
+                <View style={styles.slipDetailsRow}>
+                  <View style={styles.slipMain}>
+                    <Text style={styles.slipTitleText} numberOfLines={1}>
+                      {tipster.latestSlip.title}
+                    </Text>
+                    <Text style={styles.slipSubInfo}>
+                      {tipster.latestSlip.matchesCount} Matches • {tipster.latestSlip.bookmaker} • {tipster.latestSlip.amount}
+                    </Text>
+                  </View>
+
+                  <View style={styles.oddsBox}>
+                    <Text style={styles.oddsNumber}>
+                      {tipster.latestSlip.totalOdds.toFixed(2)}
+                    </Text>
+                    <Text style={styles.oddsLabel}>ODDS</Text>
+                  </View>
+                </View>
+
+                {/* View Slip Shortcut Button */}
+                <TouchableOpacity
+                  style={styles.viewSlipShortcut}
+                  onPress={() => setActiveSlip(tipster.latestSlip ?? null)}
+                  activeOpacity={0.8}
+                >
+                  <Text style={styles.viewSlipShortcutText}>View Published Slip</Text>
+                  <Ionicons name="arrow-forward" size={14} color={colors.primary} />
                 </TouchableOpacity>
               </View>
-            ))}
+            )}
           </View>
-        )}
+        ))}
       </ScrollView>
+
+      {/* Interactive View Slip Modal */}
+      <Modal
+        visible={!!activeSlip}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setActiveSlip(null)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            {/* Modal Header */}
+            <View style={styles.modalHeader}>
+              <View>
+                <Text style={styles.modalSubtitle}>{activeSlip?.tipster.name}&apos;S BETSLIP</Text>
+                <Text style={styles.modalTitle}>{activeSlip?.title}</Text>
+              </View>
+              <TouchableOpacity
+                onPress={() => setActiveSlip(null)}
+                style={styles.closeBtn}
+                activeOpacity={0.7}
+              >
+                <Ionicons name="close" size={24} color={colors.text} />
+              </TouchableOpacity>
+            </View>
+
+            {/* Modal Summary Bar */}
+            <View style={styles.modalSummaryBar}>
+              <View style={styles.modalSummaryItem}>
+                <Text style={styles.modalSummaryLabel}>Total Odds</Text>
+                <Text style={styles.modalSummaryOdds}>{activeSlip?.totalOdds.toFixed(2)}</Text>
+              </View>
+              <View style={styles.modalSummaryDivider} />
+              <View style={styles.modalSummaryItem}>
+                <Text style={styles.modalSummaryLabel}>Selections</Text>
+                <Text style={styles.modalSummaryValue}>{activeSlip?.matchesCount} Picks</Text>
+              </View>
+              <View style={styles.modalSummaryDivider} />
+              <View style={styles.modalSummaryItem}>
+                <Text style={styles.modalSummaryLabel}>Price</Text>
+                <Text style={[styles.modalSummaryValue, activeSlip?.isFree ? styles.freeText : styles.paidText]}>
+                  {activeSlip?.amount}
+                </Text>
+              </View>
+            </View>
+
+            {/* Matches list */}
+            <ScrollView style={styles.modalMatchesList} showsVerticalScrollIndicator={false}>
+              <Text style={styles.matchesSectionTitle}>
+                Match Selections ({activeSlip?.selections.length})
+              </Text>
+
+              {activeSlip?.selections.map((match, index) => (
+                <View key={match.id} style={styles.matchItemCard}>
+                  <View style={styles.matchItemHeader}>
+                    <Text style={styles.matchIndex}>#{index + 1} {match.league}</Text>
+                    <Text style={styles.matchTime}>{match.kickoff}</Text>
+                  </View>
+                  <Text style={styles.matchTeamsText}>{match.match}</Text>
+                  <View style={styles.matchPickRow}>
+                    <View style={styles.pickBadge}>
+                      <Text style={styles.pickLabel}>PICK:</Text>
+                      <Text style={styles.pickValue}>{match.pick}</Text>
+                    </View>
+                    <View style={styles.itemOddsBadge}>
+                      <Text style={styles.itemOddsText}>@{match.odds.toFixed(2)}</Text>
+                    </View>
+                  </View>
+                </View>
+              ))}
+            </ScrollView>
+
+            {/* Booking Code Bar */}
+            <View style={styles.bookingCodeSection}>
+              <View style={styles.codeInfo}>
+                <View style={styles.modalBookmakerRow}>
+                  <Text style={styles.codeLabel}>BOOKING CODE</Text>
+                  <View style={styles.modalBookmakerBadge}>
+                    <Text style={styles.modalBookmakerText}>{activeSlip?.bookmaker.toUpperCase()}</Text>
+                  </View>
+                </View>
+                <Text style={styles.codeValue}>{activeSlip?.bookingCode}</Text>
+              </View>
+              <TouchableOpacity
+                style={[styles.copyBtn, copiedCode === activeSlip?.bookingCode && styles.copyBtnSuccess]}
+                onPress={() => activeSlip && handleCopyCode(activeSlip.bookingCode)}
+                activeOpacity={0.8}
+              >
+                <Ionicons
+                  name={copiedCode === activeSlip?.bookingCode ? 'checkmark-circle' : 'copy-outline'}
+                  size={18}
+                  color={colors.primary}
+                />
+                <Text style={styles.copyBtnText}>
+                  {copiedCode === activeSlip?.bookingCode ? 'Copied!' : 'Copy Code'}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -117,73 +313,443 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 14,
     borderBottomWidth: 1,
     borderBottomColor: colors.cardBorder,
   },
+  headerSubtitle: {
+    color: colors.secondary,
+    fontSize: 10,
+    fontWeight: '800',
+    letterSpacing: 1.2,
+  },
   headerTitle: {
     color: colors.text,
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: '800',
+    marginTop: 2,
   },
-  pillContainer: {
-    flexDirection: 'row',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    gap: 8,
-  },
-  pill: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 20,
-    backgroundColor: colors.card,
+  headerBadge: {
+    backgroundColor: colors.badgeGreenBg,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 12,
     borderWidth: 1,
-    borderColor: colors.cardBorder,
+    borderColor: colors.badgeGreenBorder,
   },
-  pillActive: {
-    backgroundColor: colors.secondary,
-    borderColor: colors.secondary,
-  },
-  pillText: {
-    color: colors.textSecondary,
-    fontSize: 13,
-    fontWeight: '600',
-  },
-  pillTextActive: {
-    color: colors.primary,
+  headerBadgeText: {
+    color: colors.secondary,
+    fontSize: 12,
     fontWeight: '700',
   },
   scrollContent: {
     padding: 16,
     paddingBottom: 110,
   },
-  followingCard: {
+  statsBanner: {
+    flexDirection: 'row',
     backgroundColor: colors.card,
-    borderRadius: 14,
-    padding: 16,
-    marginBottom: 12,
-    borderWidth: 1,
+    borderRadius: 16,
+    paddingVertical: 14,
+    paddingHorizontal: 12,
+    marginBottom: 20,
+    borderWidth: 1.5,
     borderColor: colors.cardBorder,
+    alignItems: 'center',
+    justifyContent: 'space-around',
   },
-  cardHeader: {
+  statBox: {
+    alignItems: 'center',
+    flex: 1,
+  },
+  statDivider: {
+    width: 1,
+    height: 28,
+    backgroundColor: colors.cardBorder,
+  },
+  statNumber: {
+    color: colors.text,
+    fontSize: 18,
+    fontWeight: '800',
+  },
+  statHighlight: {
+    color: colors.secondary,
+    fontSize: 18,
+    fontWeight: '800',
+  },
+  statLabel: {
+    color: colors.textSecondary,
+    fontSize: 11,
+    marginTop: 2,
+    fontWeight: '600',
+  },
+  sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 6,
+    marginBottom: 12,
   },
-  leagueText: {
+  sectionTitle: {
+    color: colors.text,
+    fontSize: 18,
+    fontWeight: '800',
+  },
+  sectionCount: {
+    color: colors.textSecondary,
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  tipsterCard: {
+    backgroundColor: colors.card,
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 16,
+    borderWidth: 1.5,
+    borderColor: colors.cardBorder,
+  },
+  cardTopRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  avatar: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+    position: 'relative',
+  },
+  avatarText: {
+    color: colors.text,
+    fontSize: 19,
+    fontWeight: '800',
+  },
+  onlinePulse: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: colors.secondary,
+    borderWidth: 2,
+    borderColor: colors.card,
+  },
+  profileInfo: {
+    flex: 1,
+  },
+  nameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  tipsterName: {
+    color: colors.text,
+    fontSize: 16,
+    fontWeight: '800',
+  },
+  tipsterHandle: {
+    color: colors.textSecondary,
+    fontSize: 12,
+    marginTop: 2,
+    fontWeight: '500',
+  },
+  notifBtn: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    backgroundColor: '#0F1A34',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 8,
+    borderWidth: 1,
+    borderColor: colors.cardBorder,
+  },
+  followActionBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 8,
+    gap: 4,
+  },
+  followingBtnActive: {
+    backgroundColor: '#0F1A34',
+    borderWidth: 1,
+    borderColor: colors.secondary,
+  },
+  followingBtnText: {
+    color: colors.secondary,
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  followBtn: {
+    backgroundColor: colors.secondary,
+  },
+  followBtnText: {
+    color: colors.primary,
+    fontSize: 12,
+    fontWeight: '800',
+  },
+  tagsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 10,
+    flexWrap: 'wrap',
+  },
+  winRateBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.badgeGreenBg,
+    borderWidth: 1,
+    borderColor: colors.badgeGreenBorder,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+    gap: 4,
+  },
+  winRateText: {
+    color: colors.secondary,
+    fontSize: 12,
+    fontWeight: '800',
+  },
+  streakBadge: {
+    backgroundColor: colors.badgeGoldBg,
+    borderWidth: 1,
+    borderColor: colors.badgeGoldBorder,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+  },
+  streakText: {
+    color: colors.gold,
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  slipsBadge: {
+    backgroundColor: '#0F1A34',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: colors.cardBorder,
+  },
+  slipsBadgeText: {
     color: colors.textSecondary,
     fontSize: 11,
     fontWeight: '600',
   },
-  matchTitle: {
-    color: colors.text,
-    fontSize: 16,
+  specialtyText: {
+    color: colors.textSecondary,
+    fontSize: 12,
+    marginBottom: 14,
+    lineHeight: 18,
+  },
+  specialtyLabel: {
+    color: colors.textMuted,
     fontWeight: '700',
+  },
+  latestSlipBox: {
+    backgroundColor: '#0F1A34',
+    borderRadius: 12,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: colors.cardBorder,
+  },
+  latestSlipHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  latestSlipTag: {
+    backgroundColor: colors.badgeGreenBg,
+    borderWidth: 1,
+    borderColor: colors.badgeGreenBorder,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  latestSlipTagText: {
+    color: colors.secondary,
+    fontSize: 9,
+    fontWeight: '800',
+    letterSpacing: 0.8,
+  },
+  validityText: {
+    color: colors.textMuted,
+    fontSize: 11,
+    fontWeight: '600',
+  },
+  slipDetailsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: 10,
   },
-  tipRow: {
+  slipMain: {
+    flex: 1,
+    marginRight: 10,
+  },
+  slipTitleText: {
+    color: colors.text,
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  slipSubInfo: {
+    color: colors.textSecondary,
+    fontSize: 12,
+    marginTop: 2,
+  },
+  oddsBox: {
+    alignItems: 'flex-end',
+  },
+  oddsNumber: {
+    color: colors.secondary,
+    fontSize: 18,
+    fontWeight: '900',
+  },
+  oddsLabel: {
+    color: colors.secondary,
+    fontSize: 9,
+    fontWeight: '800',
+  },
+  viewSlipShortcut: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.secondary,
+    paddingVertical: 8,
+    borderRadius: 8,
+    gap: 6,
+  },
+  viewSlipShortcutText: {
+    color: colors.primary,
+    fontSize: 12,
+    fontWeight: '800',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.75)',
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    backgroundColor: '#111D3B',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    padding: 20,
+    maxHeight: '85%',
+    borderWidth: 1,
+    borderColor: colors.cardBorder,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 16,
+  },
+  modalSubtitle: {
+    color: colors.secondary,
+    fontSize: 11,
+    fontWeight: '800',
+    letterSpacing: 1,
+  },
+  modalTitle: {
+    color: colors.text,
+    fontSize: 18,
+    fontWeight: '800',
+    marginTop: 2,
+  },
+  closeBtn: {
+    padding: 4,
+  },
+  modalSummaryBar: {
+    flexDirection: 'row',
+    backgroundColor: colors.card,
+    borderRadius: 12,
+    padding: 14,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: colors.cardBorder,
+    alignItems: 'center',
+  },
+  modalSummaryItem: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  modalSummaryDivider: {
+    width: 1,
+    height: 24,
+    backgroundColor: colors.cardBorder,
+  },
+  modalSummaryLabel: {
+    color: colors.textMuted,
+    fontSize: 11,
+    marginBottom: 2,
+  },
+  modalSummaryOdds: {
+    color: colors.secondary,
+    fontSize: 18,
+    fontWeight: '900',
+  },
+  modalSummaryValue: {
+    color: colors.text,
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  freeText: {
+    color: colors.secondary,
+  },
+  paidText: {
+    color: colors.gold,
+  },
+  modalMatchesList: {
+    maxHeight: 280,
+    marginBottom: 16,
+  },
+  matchesSectionTitle: {
+    color: colors.textSecondary,
+    fontSize: 12,
+    fontWeight: '700',
+    letterSpacing: 0.8,
+    marginBottom: 10,
+  },
+  matchItemCard: {
+    backgroundColor: colors.card,
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: colors.cardBorder,
+  },
+  matchItemHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 4,
+  },
+  matchIndex: {
+    color: colors.textMuted,
+    fontSize: 11,
+    fontWeight: '600',
+  },
+  matchTime: {
+    color: colors.textSecondary,
+    fontSize: 11,
+  },
+  matchTeamsText: {
+    color: colors.text,
+    fontSize: 14,
+    fontWeight: '700',
+    marginBottom: 8,
+  },
+  matchPickRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -191,76 +757,94 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: colors.cardBorder,
   },
-  tipBadge: {
+  pickBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  pickLabel: {
+    color: colors.textMuted,
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  pickValue: {
     color: colors.secondary,
     fontSize: 13,
     fontWeight: '700',
   },
-  oddsText: {
-    color: colors.textSecondary,
+  itemOddsBadge: {
+    backgroundColor: colors.badgeGreenBg,
+    borderWidth: 1,
+    borderColor: colors.badgeGreenBorder,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+  },
+  itemOddsText: {
+    color: colors.secondary,
     fontSize: 13,
-    fontWeight: '700',
+    fontWeight: '800',
   },
-  leagueItem: {
+  bookingCodeSection: {
     flexDirection: 'row',
-    alignItems: 'center',
     backgroundColor: colors.card,
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 10,
-    gap: 12,
-    borderWidth: 1,
-    borderColor: colors.cardBorder,
-  },
-  leagueName: {
-    flex: 1,
-    color: colors.text,
-    fontSize: 15,
-    fontWeight: '600',
-  },
-  tipsterCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.card,
+    borderRadius: 14,
     padding: 14,
-    borderRadius: 12,
-    marginBottom: 10,
+    alignItems: 'center',
+    justifyContent: 'space-between',
     borderWidth: 1,
     borderColor: colors.cardBorder,
   },
-  avatar: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
-    backgroundColor: colors.cardBorder,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 12,
-  },
-  tipsterInfo: {
+  codeInfo: {
     flex: 1,
   },
-  tipsterName: {
-    color: colors.text,
-    fontSize: 15,
-    fontWeight: '700',
+  modalBookmakerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
   },
-  tipsterRate: {
-    color: colors.textSecondary,
-    fontSize: 12,
+  modalBookmakerBadge: {
+    backgroundColor: colors.badgeGreenBg,
+    borderWidth: 1,
+    borderColor: colors.badgeGreenBorder,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+  modalBookmakerText: {
+    color: colors.secondary,
+    fontSize: 9,
+    fontWeight: '900',
+    letterSpacing: 0.6,
+  },
+  codeLabel: {
+    color: colors.textMuted,
+    fontSize: 10,
+    fontWeight: '800',
+    letterSpacing: 1,
+  },
+  codeValue: {
+    color: colors.text,
+    fontSize: 18,
+    fontWeight: '900',
+    letterSpacing: 1.5,
     marginTop: 2,
   },
-  followingBtn: {
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: colors.secondary,
+  copyBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.secondary,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 10,
+    gap: 6,
   },
-  followingBtnText: {
-    color: colors.secondary,
-    fontSize: 12,
-    fontWeight: '600',
+  copyBtnSuccess: {
+    backgroundColor: colors.secondary,
+  },
+  copyBtnText: {
+    color: colors.primary,
+    fontSize: 13,
+    fontWeight: '800',
   },
 });
-
