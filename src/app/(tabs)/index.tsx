@@ -397,12 +397,13 @@ export default function HomeScreen() {
               <Ionicons name="shield-checkmark" size={44} color={colors.secondary} />
             </View>
 
-            {/* Featured Match Tips Section */}
+            {/* Featured Tips Section - One Big Game Only */}
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionTitle}>Featured Tips</Text>
-              <TouchableOpacity>
-                <Text style={styles.seeAllText}>See all</Text>
-              </TouchableOpacity>
+              <View style={styles.marqueeBadge}>
+                <Ionicons name="trophy" size={12} color={colors.gold} />
+                <Text style={styles.marqueeBadgeText}>BIG GAME OF THE DAY</Text>
+              </View>
             </View>
 
             {/* TOP GAME OF THE DAY WITH INTERACTIVE COMMUNITY VOTING POLL */}
@@ -609,106 +610,6 @@ export default function HomeScreen() {
                     ]}
                   >
                     {addedSlips.includes('top-game') ? 'Added' : 'Add to slip'}
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-
-            {/* Match tip card 1 */}
-            <View style={styles.tipCard}>
-              <View style={styles.cardHeader}>
-                <Text style={styles.leagueText}>PREMIER LEAGUE • 19:30</Text>
-                <View style={styles.confidenceBadge}>
-                  <Text style={styles.confidenceText}>85% Confidence</Text>
-                </View>
-              </View>
-
-              <View style={styles.matchTeams}>
-                <View style={styles.teamRow}>
-                  <Text style={styles.teamName}>Arsenal</Text>
-                  <Text style={styles.teamOdds}>1.65</Text>
-                </View>
-                <View style={styles.teamRow}>
-                  <Text style={styles.teamName}>Chelsea</Text>
-                  <Text style={styles.teamOdds}>4.20</Text>
-                </View>
-              </View>
-
-              <View style={styles.cardFooter}>
-                <View style={styles.predictionBox}>
-                  <Text style={styles.predictionLabel}>TIP:</Text>
-                  <Text style={styles.predictionValue}>Home Win (1)</Text>
-                </View>
-                <TouchableOpacity
-                  style={[
-                    styles.addToSlipBtn,
-                    addedSlips.includes('match-1') && styles.addToSlipBtnAdded,
-                  ]}
-                  activeOpacity={0.7}
-                  onPress={() => handleToggleAddToSlip('match-1')}
-                >
-                  <Ionicons
-                    name={addedSlips.includes('match-1') ? 'checkmark-circle' : 'add-circle-outline'}
-                    size={17}
-                    color={addedSlips.includes('match-1') ? colors.secondary : colors.textOnPrimary}
-                  />
-                  <Text
-                    style={[
-                      styles.addToSlipText,
-                      addedSlips.includes('match-1') && styles.addToSlipTextAdded,
-                    ]}
-                  >
-                    {addedSlips.includes('match-1') ? 'Added' : 'Add to slip'}
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-
-            {/* Match tip card 2 */}
-            <View style={styles.tipCard}>
-              <View style={styles.cardHeader}>
-                <Text style={styles.leagueText}>LA LIGA • 21:00</Text>
-                <View style={styles.confidenceBadge}>
-                  <Text style={styles.confidenceText}>80% Confidence</Text>
-                </View>
-              </View>
-
-              <View style={styles.matchTeams}>
-                <View style={styles.teamRow}>
-                  <Text style={styles.teamName}>Real Madrid</Text>
-                  <Text style={styles.teamOdds}>1.52</Text>
-                </View>
-                <View style={styles.teamRow}>
-                  <Text style={styles.teamName}>Barcelona</Text>
-                  <Text style={styles.teamOdds}>2.40</Text>
-                </View>
-              </View>
-
-              <View style={styles.cardFooter}>
-                <View style={styles.predictionBox}>
-                  <Text style={styles.predictionLabel}>TIP:</Text>
-                  <Text style={styles.predictionValue}>Over 2.5 Goals</Text>
-                </View>
-                <TouchableOpacity
-                  style={[
-                    styles.addToSlipBtn,
-                    addedSlips.includes('match-2') && styles.addToSlipBtnAdded,
-                  ]}
-                  activeOpacity={0.7}
-                  onPress={() => handleToggleAddToSlip('match-2')}
-                >
-                  <Ionicons
-                    name={addedSlips.includes('match-2') ? 'checkmark-circle' : 'add-circle-outline'}
-                    size={17}
-                    color={addedSlips.includes('match-2') ? colors.secondary : colors.textOnPrimary}
-                  />
-                  <Text
-                    style={[
-                      styles.addToSlipText,
-                      addedSlips.includes('match-2') && styles.addToSlipTextAdded,
-                    ]}
-                  >
-                    {addedSlips.includes('match-2') ? 'Added' : 'Add to slip'}
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -1238,84 +1139,22 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '800',
   },
-  seeAllText: {
-    color: colors.primary,
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  tipCard: {
-    backgroundColor: colors.card,
-    borderRadius: 14,
-    padding: 16,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: colors.cardBorder,
-  },
-  cardHeader: {
+  marqueeBadge: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 10,
-  },
-  leagueText: {
-    color: colors.textSecondary,
-    fontSize: 11,
-    fontWeight: '600',
-  },
-  confidenceBadge: {
-    backgroundColor: colors.badgeGreenBg,
-    borderWidth: 1,
-    borderColor: colors.badgeGreenBorder,
+    backgroundColor: colors.badgeGoldBg,
     paddingHorizontal: 8,
     paddingVertical: 3,
-    borderRadius: 12,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: colors.badgeGoldBorder,
+    gap: 4,
   },
-  confidenceText: {
-    color: colors.secondary,
-    fontSize: 11,
-    fontWeight: '700',
-  },
-  matchTeams: {
-    marginBottom: 10,
-  },
-  teamRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 2,
-  },
-  teamName: {
-    color: colors.text,
-    fontSize: 14,
-    fontWeight: '700',
-  },
-  teamOdds: {
-    color: colors.secondary,
-    fontSize: 14,
+  marqueeBadgeText: {
+    color: colors.gold,
+    fontSize: 9,
     fontWeight: '800',
-  },
-  cardFooter: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingTop: 10,
-    borderTopWidth: 1,
-    borderTopColor: colors.cardBorder,
-  },
-  predictionBox: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  predictionLabel: {
-    color: colors.textMuted,
-    fontSize: 11,
-    fontWeight: '800',
-  },
-  predictionValue: {
-    color: colors.secondary,
-    fontSize: 13,
-    fontWeight: '700',
+    letterSpacing: 0.6,
   },
   addToSlipBtn: {
     flexDirection: 'row',
