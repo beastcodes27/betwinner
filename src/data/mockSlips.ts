@@ -57,6 +57,7 @@ export interface TipsterSlip {
   validityTime: string;
   amount: string;
   isFree: boolean;
+  isUnlocked?: boolean;
   confidence: number;
   bookmaker: string;
   bookmakerLogo?: any;

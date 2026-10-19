@@ -23,9 +23,9 @@ export interface PurchasedSlip {
 export interface PaymentTransaction {
   id: string;
   reference: string;
-  type: 'slip_purchase' | 'deposit' | 'withdrawal';
+  type: 'slip_purchase' | 'deposit' | 'withdrawal' | 'subscription';
   description: string;
-  method: 'M-Pesa' | 'Airtel Money' | 'Card';
+  method: 'M-Pesa' | 'Airtel Money' | 'Tigo Pesa' | 'Card' | 'Wallet';
   amount: number;
   currency: string;
   date: string;
