@@ -15,13 +15,9 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '@/constants/theme';
-import {
-  HOME_ADS,
-  ALL_TIPSTERS,
-  FollowedTipster,
-  FEATURED_MATCH,
-} from '@/data/mockSlips';
+import type { FollowedTipster } from '@/data/mockSlips';
 import { useAppUI } from '@/context/UIContext';
+import { useAppData } from '@/context/AppDataContext';
 import BookmakerLogo from '@/components/BookmakerLogo';
 import TipsterAvatar from '@/components/TipsterAvatar';
 
@@ -29,44 +25,45 @@ type TipsterFilterChip = 'all' | 'high_win' | 'top_rated' | 'vip';
 
 export default function HomeScreen() {
   const { showToast, showPopup } = useAppUI();
+  const { home, tipsters: fetchedTipsters, vote, recordAdClick } = useAppData();
   const [currentAdIndex, setCurrentAdIndex] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedChip, setSelectedChip] = useState<TipsterFilterChip>('all');
-  const [tipsters, setTipsters] = useState<FollowedTipster[]>(ALL_TIPSTERS);
+  const [tipsters, setTipsters] = useState<FollowedTipster[]>(fetchedTipsters);
   const [addedSlips, setAddedSlips] = useState<string[]>([]);
+
+  const ads = home.ads;
+  const featuredMatch = home.featuredMatch;
+  const poll = home.poll;
+
+  useEffect(() => {
+    setTipsters(fetchedTipsters);
+  }, [fetchedTipsters]);
 
   // Top Game Voting Poll State
   type VoteOption = '1' | 'X' | '2';
   const [userVote, setUserVote] = useState<VoteOption | null>(null);
-  const [voteCounts, setVoteCounts] = useState<{ [key in VoteOption]: number }>({
-    '1': 8420,
-    'X': 2140,
-    '2': 3860,
-  });
 
   const handleVote = (option: VoteOption) => {
-    setVoteCounts((prev) => {
-      const updated = { ...prev };
-      if (userVote && userVote !== option) {
-        updated[userVote] = Math.max(0, updated[userVote] - 1);
-      }
-      if (userVote !== option) {
-        updated[option] = updated[option] + 1;
-      }
-      return updated;
-    });
     setUserVote(option);
     showToast({
       type: 'success',
       title: 'Prediction Vote Recorded! 🗳️',
-      message: `You voted for ${option === '1' ? 'Arsenal (1)' : option === 'X' ? 'Draw (X)' : 'Chelsea (2)'}. View live percentages above!`,
+      message: `You voted for ${option === '1' ? `${featuredMatch.homeTeam.name} (1)` : option === 'X' ? 'Draw (X)' : `${featuredMatch.awayTeam.name} (2)`}. View live percentages above!`,
+    });
+    void vote(option).catch(() => {
+      showToast({
+        type: 'warning',
+        title: 'Vote Saved Locally',
+        message: 'The live poll is offline, so your pick was only counted on this device.',
+      });
     });
   };
 
-  const totalVotes = voteCounts['1'] + voteCounts['X'] + voteCounts['2'];
-  const pct1 = Math.round((voteCounts['1'] / totalVotes) * 100);
-  const pctX = Math.round((voteCounts['X'] / totalVotes) * 100);
-  const pct2 = 100 - pct1 - pctX;
+  const totalVotes = poll.homeVotes + poll.drawVotes + poll.awayVotes;
+  const pct1 = totalVotes > 0 ? Math.round((poll.homeVotes / totalVotes) * 100) : 0;
+  const pctX = totalVotes > 0 ? Math.round((poll.drawVotes / totalVotes) * 100) : 0;
+  const pct2 = totalVotes > 0 ? 100 - pct1 - pctX : 0;
 
   // Auto-scrolling Ads Board Setup (3-second interval)
   const { width: windowWidth } = useWindowDimensions();
@@ -79,19 +76,19 @@ export default function HomeScreen() {
     if (timerRef.current) {
       clearInterval(timerRef.current);
     }
-    if (HOME_ADS.length <= 1 || bannerWidth <= 0) return;
+    if (ads.length <= 1 || bannerWidth <= 0) return;
 
     timerRef.current = setInterval(() => {
       setCurrentAdIndex((prevIndex) => {
-        const nextIndex = (prevIndex + 1) % HOME_ADS.length;
+        const nextIndex = (prevIndex + 1) % ads.length;
         adScrollRef.current?.scrollTo({
           x: nextIndex * bannerWidth,
           animated: true,
         });
         return nextIndex;
       });
-    }, 3000);
-  }, [bannerWidth]);
+    }, home.rotationIntervalMs || 3000);
+  }, [ads.length, bannerWidth, home.rotationIntervalMs]);
 
   useEffect(() => {
     startAutoScroll();
@@ -103,7 +100,7 @@ export default function HomeScreen() {
   }, [startAutoScroll]);
 
   const handleNextAd = () => {
-    const nextIndex = (currentAdIndex + 1) % HOME_ADS.length;
+    const nextIndex = (currentAdIndex + 1) % ads.length;
     setCurrentAdIndex(nextIndex);
     adScrollRef.current?.scrollTo({
       x: nextIndex * bannerWidth,
@@ -113,7 +110,7 @@ export default function HomeScreen() {
   };
 
   const handlePrevAd = () => {
-    const prevIndex = (currentAdIndex - 1 + HOME_ADS.length) % HOME_ADS.length;
+    const prevIndex = (currentAdIndex - 1 + ads.length) % ads.length;
     setCurrentAdIndex(prevIndex);
     adScrollRef.current?.scrollTo({
       x: prevIndex * bannerWidth,
@@ -141,7 +138,7 @@ export default function HomeScreen() {
     if (bannerWidth <= 0) return;
     const offsetX = e.nativeEvent.contentOffset.x;
     const newIndex = Math.round(offsetX / bannerWidth);
-    if (newIndex >= 0 && newIndex < HOME_ADS.length) {
+    if (newIndex >= 0 && newIndex < ads.length) {
       setCurrentAdIndex(newIndex);
     }
     startAutoScroll();
@@ -261,7 +258,7 @@ export default function HomeScreen() {
                 <Ionicons name="chevron-back" size={16} color={colors.textSecondary} />
               </TouchableOpacity>
               <View style={styles.dotsRow}>
-                {HOME_ADS.map((ad, idx) => (
+                {ads.map((ad, idx) => (
                   <TouchableOpacity
                     key={ad.id}
                     onPress={() => handleGoToAd(idx)}
@@ -296,7 +293,7 @@ export default function HomeScreen() {
               onScrollBeginDrag={handleScrollBeginDrag}
               onMomentumScrollEnd={handleMomentumScrollEnd}
             >
-              {HOME_ADS.map((ad) => (
+              {ads.map((ad) => (
                 <View key={ad.id} style={{ width: bannerWidth }}>
                   {/* Ad Body */}
                   <View style={styles.adContent}>
@@ -342,6 +339,7 @@ export default function HomeScreen() {
                           primaryText: 'Claim Bonus',
                           secondaryText: 'Close',
                           onConfirm: () => {
+                            void recordAdClick(ad.id);
                             showToast({
                               type: 'success',
                               title: 'Promo Claimed Successfully!',
@@ -528,14 +526,14 @@ export default function HomeScreen() {
             <View style={styles.topTipstersSection}>
               <View style={styles.sectionHeader}>
                 <Text style={styles.sectionTitle}>Top Rated Tipsters</Text>
-                <Text style={styles.tipstersCountText}>{ALL_TIPSTERS.length} Verified</Text>
+                <Text style={styles.tipstersCountText}>{tipsters.length} Verified</Text>
               </View>
               <ScrollView
                 horizontal
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={styles.topTipstersScroll}
               >
-                {ALL_TIPSTERS.slice(0, 5).map((tipster) => (
+                {tipsters.slice(0, 5).map((tipster) => (
                   <TouchableOpacity
                     key={tipster.id}
                     style={styles.tipsterMiniCard}
@@ -591,10 +589,10 @@ export default function HomeScreen() {
                   <Text style={styles.topGameBadgeText}>TOP GAME OF THE DAY</Text>
                 </View>
                 <View style={styles.topGameHeaderRight}>
-                  {FEATURED_MATCH.bookmaker && (
+                  {featuredMatch.bookmaker && (
                     <BookmakerLogo
-                      name={FEATURED_MATCH.bookmaker}
-                      source={FEATURED_MATCH.bookmakerLogo}
+                      name={featuredMatch.bookmaker}
+                      source={featuredMatch.bookmakerLogo}
                       size="xs"
                     />
                   )}
@@ -607,22 +605,22 @@ export default function HomeScreen() {
 
               {/* League & Time */}
               <View style={styles.topGameLeagueRow}>
-                {FEATURED_MATCH.leagueLogo && (
+                {featuredMatch.leagueLogo && (
                   <Image
-                    source={FEATURED_MATCH.leagueLogo}
+                    source={featuredMatch.leagueLogo}
                     style={styles.leagueLogoImg}
                     resizeMode="contain"
                   />
                 )}
-                <Text style={styles.topGameLeague}>{FEATURED_MATCH.league}</Text>
+                <Text style={styles.topGameLeague}>{featuredMatch.league}</Text>
               </View>
 
               {/* Teams Matchup Showcase */}
               <View style={styles.topGameVersusContainer}>
                 <View style={styles.topGameTeam}>
-                  {FEATURED_MATCH.homeTeam.logo ? (
+                  {featuredMatch.homeTeam.logo ? (
                     <Image
-                      source={FEATURED_MATCH.homeTeam.logo}
+                      source={featuredMatch.homeTeam.logo}
                       style={styles.teamLogoImg}
                       resizeMode="contain"
                     />
@@ -631,21 +629,21 @@ export default function HomeScreen() {
                       <Text style={styles.teamEmblemText}>ARS</Text>
                     </View>
                   )}
-                  <Text style={styles.topGameTeamName}>{FEATURED_MATCH.homeTeam.name}</Text>
-                  <Text style={styles.topGameForm}>{FEATURED_MATCH.homeTeam.form}</Text>
+                  <Text style={styles.topGameTeamName}>{featuredMatch.homeTeam.name}</Text>
+                  <Text style={styles.topGameForm}>{featuredMatch.homeTeam.form}</Text>
                 </View>
 
                 <View style={styles.vsCenterBox}>
                   <View style={styles.vsCircle}>
                     <Text style={styles.vsText}>VS</Text>
                   </View>
-                  <Text style={styles.topGameVenue}>{FEATURED_MATCH.venue}</Text>
+                  <Text style={styles.topGameVenue}>{featuredMatch.venue}</Text>
                 </View>
 
                 <View style={styles.topGameTeam}>
-                  {FEATURED_MATCH.awayTeam.logo ? (
+                  {featuredMatch.awayTeam.logo ? (
                     <Image
-                      source={FEATURED_MATCH.awayTeam.logo}
+                      source={featuredMatch.awayTeam.logo}
                       style={styles.teamLogoImg}
                       resizeMode="contain"
                     />
@@ -654,8 +652,8 @@ export default function HomeScreen() {
                       <Text style={styles.teamEmblemText}>CHE</Text>
                     </View>
                   )}
-                  <Text style={styles.topGameTeamName}>{FEATURED_MATCH.awayTeam.name}</Text>
-                  <Text style={styles.topGameForm}>{FEATURED_MATCH.awayTeam.form}</Text>
+                  <Text style={styles.topGameTeamName}>{featuredMatch.awayTeam.name}</Text>
+                  <Text style={styles.topGameForm}>{featuredMatch.awayTeam.form}</Text>
                 </View>
               </View>
 
@@ -663,7 +661,8 @@ export default function HomeScreen() {
               <View style={styles.consensusBox}>
                 <Ionicons name="stats-chart" size={13} color={colors.secondary} />
                 <Text style={styles.consensusText}>
-                  Tipster Consensus: <Text style={styles.consensusBold}>74% Predict Arsenal Win (1)</Text>
+                  Tipster Consensus:{' '}
+                  <Text style={styles.consensusBold}>{featuredMatch.tipsterConsensus}</Text>
                 </Text>
               </View>
 
@@ -686,14 +685,14 @@ export default function HomeScreen() {
                   >
                     <View style={styles.pollBtnTop}>
                       <Text style={[styles.pollChoice, userVote === '1' && styles.pollChoiceSelected]}>
-                        1 • Arsenal
+                        1 • {featuredMatch.homeTeam.name}
                       </Text>
                       {userVote === '1' && (
                         <Ionicons name="checkmark-circle" size={13} color={colors.primary} />
                       )}
                     </View>
                     <View style={styles.pollOddsRow}>
-                      <Text style={styles.pollOddsText}>1.95</Text>
+                      <Text style={styles.pollOddsText}>{featuredMatch.homeTeam.odds.toFixed(2)}</Text>
                       <Text style={[styles.pollPctText, userVote === '1' && styles.pollPctSelected]}>
                         {pct1}%
                       </Text>
@@ -729,7 +728,7 @@ export default function HomeScreen() {
                       )}
                     </View>
                     <View style={styles.pollOddsRow}>
-                      <Text style={styles.pollOddsText}>3.40</Text>
+                      <Text style={styles.pollOddsText}>{featuredMatch.draw.odds.toFixed(2)}</Text>
                       <Text style={[styles.pollPctText, userVote === 'X' && styles.pollPctSelected]}>
                         {pctX}%
                       </Text>
@@ -758,14 +757,14 @@ export default function HomeScreen() {
                   >
                     <View style={styles.pollBtnTop}>
                       <Text style={[styles.pollChoice, userVote === '2' && styles.pollChoiceSelected]}>
-                        2 • Chelsea
+                        2 • {featuredMatch.awayTeam.name}
                       </Text>
                       {userVote === '2' && (
                         <Ionicons name="checkmark-circle" size={13} color={colors.primary} />
                       )}
                     </View>
                     <View style={styles.pollOddsRow}>
-                      <Text style={styles.pollOddsText}>3.80</Text>
+                      <Text style={styles.pollOddsText}>{featuredMatch.awayTeam.odds.toFixed(2)}</Text>
                       <Text style={[styles.pollPctText, userVote === '2' && styles.pollPctSelected]}>
                         {pct2}%
                       </Text>
@@ -792,7 +791,11 @@ export default function HomeScreen() {
                     <Text style={styles.votedStatusText}>
                       ✓ Your Vote:{' '}
                       <Text style={styles.votedBold}>
-                        {userVote === '1' ? 'Arsenal' : userVote === 'X' ? 'Draw' : 'Chelsea'}
+                        {userVote === '1'
+                          ? featuredMatch.homeTeam.name
+                          : userVote === 'X'
+                          ? 'Draw'
+                          : featuredMatch.awayTeam.name}
                       </Text>
                     </Text>
                   ) : (

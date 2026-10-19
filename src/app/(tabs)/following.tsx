@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -10,20 +10,22 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '@/constants/theme';
-import {
-  FOLLOWED_TIPSTERS,
-  FollowedTipster,
-  TipsterSlip,
-} from '@/data/mockSlips';
+import type { FollowedTipster, TipsterSlip } from '@/data/mockSlips';
 import { useAppUI } from '@/context/UIContext';
+import { useAppData } from '@/context/AppDataContext';
 import BookmakerLogo from '@/components/BookmakerLogo';
 import TipsterAvatar from '@/components/TipsterAvatar';
 
 export default function FollowingScreen() {
   const { showToast } = useAppUI();
-  const [tipsters, setTipsters] = useState<FollowedTipster[]>(FOLLOWED_TIPSTERS);
+  const { tipsters: fetchedTipsters } = useAppData();
+  const [tipsters, setTipsters] = useState<FollowedTipster[]>(fetchedTipsters);
   const [activeSlip, setActiveSlip] = useState<TipsterSlip | null>(null);
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
+
+  useEffect(() => {
+    setTipsters(fetchedTipsters);
+  }, [fetchedTipsters]);
 
   // Toggle follow status
   const handleToggleFollow = (id: string) => {
@@ -76,6 +78,16 @@ export default function FollowingScreen() {
   };
 
   const followingCount = tipsters.filter((t) => t.isFollowing).length;
+  const averageWinRate = tipsters.length
+    ? (
+        tipsters.reduce((total, tipster) => total + parseInt(tipster.winRate, 10), 0) /
+        tipsters.length
+      ).toFixed(1)
+    : '0.0';
+  const activeSlipsCount = tipsters.reduce(
+    (total, tipster) => total + tipster.activeSlipsCount,
+    0,
+  );
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -99,12 +111,12 @@ export default function FollowingScreen() {
           </View>
           <View style={styles.statDivider} />
           <View style={styles.statBox}>
-            <Text style={styles.statHighlight}>84.4%</Text>
+            <Text style={styles.statHighlight}>{averageWinRate}%</Text>
             <Text style={styles.statLabel}>Avg. Win Rate</Text>
           </View>
           <View style={styles.statDivider} />
           <View style={styles.statBox}>
-            <Text style={styles.statNumber}>12</Text>
+            <Text style={styles.statNumber}>{activeSlipsCount}</Text>
             <Text style={styles.statLabel}>Active Slips</Text>
           </View>
         </View>
