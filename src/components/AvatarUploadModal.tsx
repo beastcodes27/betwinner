@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -9,6 +9,7 @@ import {
   Image,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
 import { colors } from '@/constants/theme';
 import { TIPSTER_AVATARS } from '@/data/mockSlips';
 import { useAppUI } from '@/context/UIContext';
@@ -41,10 +42,50 @@ export default function AvatarUploadModal({
   const { showToast } = useAppUI();
   const [selectedAvatar, setSelectedAvatar] = useState<any>(currentAvatar || TIPSTER_AVATARS.alex_user);
 
-  const handleSimulatePhoto = (sourceType: 'camera' | 'gallery') => {
-    // In real app, launches expo-image-picker; here we simulate high-res camera/gallery upload
-    const mockUploadedAvatar = TIPSTER_AVATARS.alex_user;
-    setSelectedAvatar(mockUploadedAvatar);
+  useEffect(() => {
+    if (visible) {
+      setSelectedAvatar(currentAvatar || TIPSTER_AVATARS.alex_user);
+    }
+  }, [currentAvatar, visible]);
+
+  const handlePickPhoto = async (sourceType: 'camera' | 'gallery') => {
+    const permission =
+      sourceType === 'camera'
+        ? await ImagePicker.requestCameraPermissionsAsync()
+        : await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (!permission.granted) {
+      showToast({
+        type: 'warning',
+        title: 'Permission Required',
+        message:
+          sourceType === 'camera'
+            ? 'Camera access is needed to take a profile photo.'
+            : 'Photo library access is needed to choose a profile photo.',
+      });
+      return;
+    }
+
+    const result =
+      sourceType === 'camera'
+        ? await ImagePicker.launchCameraAsync({
+            mediaTypes: ['images'],
+            allowsEditing: true,
+            aspect: [1, 1],
+            quality: 0.8,
+          })
+        : await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ['images'],
+            allowsEditing: true,
+            aspect: [1, 1],
+            quality: 0.8,
+          });
+
+    if (result.canceled || !result.assets[0]) {
+      return;
+    }
+
+    setSelectedAvatar(result.assets[0].uri);
     showToast({
       type: 'success',
       title: sourceType === 'camera' ? 'Photo Captured' : 'Image Selected',
@@ -127,7 +168,9 @@ export default function AvatarUploadModal({
               <TouchableOpacity
                 style={styles.actionBtn}
                 activeOpacity={0.8}
-                onPress={() => handleSimulatePhoto('camera')}
+                onPress={() => {
+                  void handlePickPhoto('camera');
+                }}
               >
                 <View style={[styles.actionIconCircle, { backgroundColor: colors.badgeGreenBg }]}>
                   <Ionicons name="camera-outline" size={22} color={colors.secondary} />
@@ -139,7 +182,9 @@ export default function AvatarUploadModal({
               <TouchableOpacity
                 style={styles.actionBtn}
                 activeOpacity={0.8}
-                onPress={() => handleSimulatePhoto('gallery')}
+                onPress={() => {
+                  void handlePickPhoto('gallery');
+                }}
               >
                 <View style={[styles.actionIconCircle, { backgroundColor: colors.badgeGoldBg }]}>
                   <Ionicons name="images-outline" size={22} color={colors.gold} />
@@ -427,3 +472,4 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
 });
+

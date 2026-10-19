@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -11,16 +11,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '@/constants/theme';
 import { useAppUI } from '@/context/UIContext';
+import { useAppData } from '@/context/AppDataContext';
 import BookmakerLogo from '@/components/BookmakerLogo';
 import TipsterAvatar from '@/components/TipsterAvatar';
 import AvatarUploadModal from '@/components/AvatarUploadModal';
 import { TIPSTER_AVATARS } from '@/data/mockSlips';
-import {
-  MOCK_PURCHASED_SLIPS,
-  MOCK_PAYMENTS,
-  FAQS,
-  PurchasedSlip,
-} from '@/data/mockUserData';
+import { FAQS, type PurchasedSlip } from '@/data/mockUserData';
 
 type ActiveModal =
   | null
@@ -36,6 +32,7 @@ type SlipStatusFilter = 'all' | 'active' | 'won' | 'lost';
 
 export default function ProfileScreen() {
   const { showToast, showPopup } = useAppUI();
+  const { profile, uploadAvatar, removeAvatar } = useAppData();
   const [activeModal, setActiveModal] = useState<ActiveModal>(null);
   const [selectedSlip, setSelectedSlip] = useState<PurchasedSlip | null>(null);
   const [slipFilter, setSlipFilter] = useState<SlipStatusFilter>('all');
@@ -45,6 +42,42 @@ export default function ProfileScreen() {
   const [isAccountDeleted, setIsAccountDeleted] = useState(false);
   const [profileAvatar, setProfileAvatar] = useState<any>(TIPSTER_AVATARS.alex_user);
   const [showAvatarModal, setShowAvatarModal] = useState(false);
+
+  const purchasedSlips = profile.purchasedSlips;
+  const payments = profile.payments;
+  const walletBalance = profile.user.walletBalance;
+  const totalSpent = profile.stats.totalSpent;
+  const totalDeposited = profile.stats.totalDeposited;
+
+  useEffect(() => {
+    if (profile.user.avatarUrl) {
+      setProfileAvatar({ uri: profile.user.avatarUrl });
+    }
+  }, [profile.user.avatarUrl]);
+
+  const handleSaveAvatar = (newAvatar: any) => {
+    setProfileAvatar(newAvatar);
+
+    if (typeof newAvatar === 'string') {
+      void uploadAvatar(newAvatar).catch((error) => {
+        showToast({
+          type: 'error',
+          title: 'Upload Failed',
+          message: error instanceof Error ? error.message : 'Unable to save your profile picture.',
+        });
+      });
+    }
+
+    if (newAvatar === null) {
+      void removeAvatar().catch((error) => {
+        showToast({
+          type: 'error',
+          title: 'Update Failed',
+          message: error instanceof Error ? error.message : 'Unable to remove your profile picture.',
+        });
+      });
+    }
+  };
 
   const handleCopyCode = (code: string) => {
     setCopiedCode(code);
@@ -58,20 +91,10 @@ export default function ProfileScreen() {
     }, 2500);
   };
 
-  const filteredPurchasedSlips = MOCK_PURCHASED_SLIPS.filter((slip) => {
+  const filteredPurchasedSlips = purchasedSlips.filter((slip) => {
     if (slipFilter === 'all') return true;
     return slip.status === slipFilter;
   });
-
-  const totalSpent = MOCK_PAYMENTS.filter((p) => p.amount < 0).reduce(
-    (acc, curr) => acc + Math.abs(curr.amount),
-    0
-  );
-  const totalDeposited = MOCK_PAYMENTS.filter((p) => p.amount > 0).reduce(
-    (acc, curr) => acc + curr.amount,
-    0
-  );
-  const walletBalance = totalDeposited - totalSpent;
 
   const handleConfirmLogout = () => {
     setActiveModal(null);
@@ -103,7 +126,9 @@ export default function ProfileScreen() {
         </View>
         <View style={styles.vipPill}>
           <Ionicons name="star" size={13} color={colors.gold} />
-          <Text style={styles.vipPillText}>VIP ACTIVE</Text>
+          <Text style={styles.vipPillText}>
+            {profile.vip.isActive ? 'VIP ACTIVE' : 'FREE TIER'}
+          </Text>
         </View>
       </View>
 
@@ -119,7 +144,7 @@ export default function ProfileScreen() {
             onPress={() => setShowAvatarModal(true)}
           >
             <TipsterAvatar
-              name={isAccountDeleted ? 'Account Deleted' : 'Alex Bettor'}
+              name={isAccountDeleted ? 'Account Deleted' : profile.user.name}
               source={profileAvatar}
               size={64}
               borderWidth={2}
@@ -132,12 +157,14 @@ export default function ProfileScreen() {
           <View style={styles.userInfo}>
             <View style={styles.userNameRow}>
               <Text style={styles.userName}>
-                {isAccountDeleted ? 'Account Deleted' : 'Alex Bettor'}
+                {isAccountDeleted ? 'Account Deleted' : profile.user.name}
               </Text>
               <Ionicons name="checkmark-circle" size={16} color={colors.secondary} />
             </View>
             <Text style={styles.userEmail}>
-              {isAccountDeleted ? 'No active account' : '+255 712 *** 890 • alex.bettor@gmail.com'}
+              {isAccountDeleted
+                ? 'No active account'
+                : `${profile.user.phone} • ${profile.user.email}`}
             </Text>
             <View style={styles.walletBox}>
               <View style={styles.walletLeft}>
@@ -154,18 +181,18 @@ export default function ProfileScreen() {
         {/* Quick Stats Summary */}
         <View style={styles.statsRow}>
           <View style={styles.statCard}>
-            <Text style={styles.statValue}>{isAccountDeleted ? '0' : MOCK_PURCHASED_SLIPS.length}</Text>
+            <Text style={styles.statValue}>{isAccountDeleted ? '0' : purchasedSlips.length}</Text>
             <Text style={styles.statLabel}>Purchased Slips</Text>
           </View>
           <View style={styles.statCard}>
             <Text style={[styles.statValue, { color: colors.secondary }]}>
-              {isAccountDeleted ? '0' : MOCK_PURCHASED_SLIPS.filter((s) => s.status === 'active').length}
+              {isAccountDeleted ? '0' : purchasedSlips.filter((s) => s.status === 'active').length}
             </Text>
             <Text style={styles.statLabel}>Active Slips</Text>
           </View>
           <View style={styles.statCard}>
             <Text style={[styles.statValue, { color: colors.gold }]}>
-              {isAccountDeleted ? '0' : MOCK_PURCHASED_SLIPS.filter((s) => s.status === 'won').length}
+              {isAccountDeleted ? '0' : purchasedSlips.filter((s) => s.status === 'won').length}
             </Text>
             <Text style={styles.statLabel}>Won Slips</Text>
           </View>
@@ -189,7 +216,7 @@ export default function ProfileScreen() {
               <Text style={styles.menuSubtitle}>View unlocked slips, odds, and booking codes</Text>
             </View>
             <View style={styles.badgePill}>
-              <Text style={styles.badgePillText}>{MOCK_PURCHASED_SLIPS.length} Slips</Text>
+              <Text style={styles.badgePillText}>{purchasedSlips.length} Slips</Text>
             </View>
             <Ionicons name="chevron-forward" size={18} color={colors.textMuted} />
           </TouchableOpacity>
@@ -355,12 +382,12 @@ export default function ProfileScreen() {
                   ]}
                 >
                   {tab === 'all'
-                    ? `All (${MOCK_PURCHASED_SLIPS.length})`
+                    ? `All (${purchasedSlips.length})`
                     : tab === 'active'
-                    ? `Active (${MOCK_PURCHASED_SLIPS.filter((s) => s.status === 'active').length})`
+                    ? `Active (${purchasedSlips.filter((s) => s.status === 'active').length})`
                     : tab === 'won'
-                    ? `Won (${MOCK_PURCHASED_SLIPS.filter((s) => s.status === 'won').length})`
-                    : `Settled (${MOCK_PURCHASED_SLIPS.filter((s) => s.status === 'lost').length})`}
+                    ? `Won (${purchasedSlips.filter((s) => s.status === 'won').length})`
+                    : `Settled (${purchasedSlips.filter((s) => s.status === 'lost').length})`}
                 </Text>
               </TouchableOpacity>
             ))}
@@ -570,9 +597,9 @@ export default function ProfileScreen() {
           </View>
 
           <ScrollView contentContainerStyle={styles.modalScroll} showsVerticalScrollIndicator={false}>
-            <Text style={styles.transactionListHeader}>ALL TRANSACTIONS ({MOCK_PAYMENTS.length})</Text>
+            <Text style={styles.transactionListHeader}>ALL TRANSACTIONS ({payments.length})</Text>
 
-            {MOCK_PAYMENTS.map((payment) => (
+            {payments.map((payment) => (
               <View key={payment.id} style={styles.transactionCard}>
                 <View style={styles.transactionTopRow}>
                   <View style={styles.txIconBox}>
@@ -889,7 +916,7 @@ export default function ProfileScreen() {
             <Text style={styles.deleteModalTitle}>Delete Account?</Text>
             <Text style={styles.deleteModalText}>
               This action is permanent and cannot be undone. All your purchased slips (
-              {MOCK_PURCHASED_SLIPS.length}), wallet balance (Tshs {walletBalance.toLocaleString()}), and followed
+              {purchasedSlips.length}), wallet balance (Tshs {walletBalance.toLocaleString()}), and followed
               tipsters will be permanently erased.
             </Text>
 
@@ -957,9 +984,9 @@ export default function ProfileScreen() {
       <AvatarUploadModal
         visible={showAvatarModal}
         currentAvatar={profileAvatar}
-        userName={isAccountDeleted ? 'Account Deleted' : 'Alex Bettor'}
+        userName={isAccountDeleted ? 'Account Deleted' : profile.user.name}
         onClose={() => setShowAvatarModal(false)}
-        onSaveAvatar={(newAvatar) => setProfileAvatar(newAvatar)}
+        onSaveAvatar={handleSaveAvatar}
       />
     </SafeAreaView>
   );
