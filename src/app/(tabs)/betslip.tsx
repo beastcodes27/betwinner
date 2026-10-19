@@ -10,70 +10,35 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '@/constants/theme';
-import { MOCK_SLIPS, TipsterSlip } from '@/data/mockSlips';
+import type { TipsterSlip } from '@/data/mockSlips';
 import { useAppUI } from '@/context/UIContext';
+import { useAppData } from '@/context/AppDataContext';
 import BookmakerLogo from '@/components/BookmakerLogo';
 import TipsterAvatar from '@/components/TipsterAvatar';
 
 type CategoryFilter = 'All' | 'Free' | 'Banker' | 'Goals' | 'VIP';
 
-export interface VipPlan {
-  id: 'single' | 'weekly' | 'monthly';
-  name: string;
-  duration: string;
-  price: string;
-  amountNum: number;
-  badge?: string;
-  description: string;
-}
-
-export const VIP_PLANS: VipPlan[] = [
-  {
-    id: 'single',
-    name: 'Single Slip Unlock',
-    duration: '1 Ticket Access',
-    price: 'Tshs 2,000',
-    amountNum: 2000,
-    description: 'Instant unlock for this specific VIP ticket & booking code',
-  },
-  {
-    id: 'weekly',
-    name: 'Weekly VIP Pass',
-    duration: '7 Days Unlimited',
-    price: 'Tshs 5,000',
-    amountNum: 5000,
-    badge: 'POPULAR',
-    description: 'Unlimited access to all VIP banker tickets & codes for 7 days',
-  },
-  {
-    id: 'monthly',
-    name: 'Monthly VIP Club',
-    duration: '30 Days Unlimited',
-    price: 'Tshs 15,000',
-    amountNum: 15000,
-    badge: 'BEST VALUE',
-    description: '30-day VIP pass + priority banker slips & instant alerts',
-  },
-];
-
 export default function BetslipScreen() {
   const { showToast, showPopup } = useAppUI();
+  const { slips, vipPlans, profile, unlockSlip, subscribeVip } = useAppData();
   const [selectedFilter, setSelectedFilter] = useState<CategoryFilter>('All');
   const [activeSlip, setActiveSlip] = useState<TipsterSlip | null>(null);
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
   const [unlockedSlipIds, setUnlockedSlipIds] = useState<string[]>([]);
-  const [isVipSubscribed, setIsVipSubscribed] = useState<boolean>(false);
   const [selectedPlanId, setSelectedPlanId] = useState<'single' | 'weekly' | 'monthly'>('weekly');
   const [showVipModal, setShowVipModal] = useState<boolean>(false);
 
+  const isVipSubscribed = profile.vip.isActive;
+
   const isSlipUnlocked = (slip: TipsterSlip) => {
     if (slip.isFree) return true;
+    if (slip.isUnlocked) return true;
     if (isVipSubscribed) return true;
     return unlockedSlipIds.includes(slip.id);
   };
 
   const handleUnlockVIP = (slip: TipsterSlip, planId: 'single' | 'weekly' | 'monthly') => {
-    const plan = VIP_PLANS.find((p) => p.id === planId) || VIP_PLANS[0];
+    const plan = vipPlans.find((p) => p.id === planId) || vipPlans[0];
     showPopup({
       title: `Subscribe: ${plan.name} 👑`,
       message: `Confirm payment of ${plan.price} from your wallet for ${plan.name}? You will get full instant access to ${slip.tipster.name}'s VIP selections and the ${slip.bookmaker} booking code.`,
@@ -82,23 +47,37 @@ export default function BetslipScreen() {
       primaryText: `Pay ${plan.price}`,
       secondaryText: 'Cancel',
       onConfirm: () => {
-        if (plan.id === 'single') {
-          setUnlockedSlipIds((prev) => [...prev, slip.id]);
-        } else {
-          setIsVipSubscribed(true);
-          setUnlockedSlipIds((prev) => [...prev, slip.id]);
-        }
-        showToast({
-          type: 'success',
-          title: 'VIP Access Activated! 👑',
-          message: `${slip.bookmaker} booking code ${slip.bookingCode} is now revealed and ready to copy.`,
-        });
+        void (async () => {
+          try {
+            let bookingCode = slip.bookingCode;
+
+            if (plan.id === 'single') {
+              bookingCode = await unlockSlip(slip.id);
+              setUnlockedSlipIds((prev) => [...prev, slip.id]);
+            } else {
+              await subscribeVip(plan.id);
+              setUnlockedSlipIds((prev) => [...prev, slip.id]);
+            }
+
+            showToast({
+              type: 'success',
+              title: 'VIP Access Activated! 👑',
+              message: `${slip.bookmaker} booking code ${bookingCode} is now revealed and ready to copy.`,
+            });
+          } catch (error) {
+            showToast({
+              type: 'error',
+              title: 'Payment Failed',
+              message: error instanceof Error ? error.message : 'Unable to complete the VIP unlock.',
+            });
+          }
+        })();
       },
     });
   };
 
   const handleSubscribeGeneral = (planId: 'weekly' | 'monthly') => {
-    const plan = VIP_PLANS.find((p) => p.id === planId) || VIP_PLANS[1];
+    const plan = vipPlans.find((p) => p.id === planId) || vipPlans[1] || vipPlans[0];
     showPopup({
       title: `Activate: ${plan.name} 👑`,
       message: `Subscribe to ${plan.name} for ${plan.price} from your wallet? You will unlock all VIP slips, booking codes, and high-odds banker combinations.`,
@@ -107,18 +86,28 @@ export default function BetslipScreen() {
       primaryText: `Subscribe for ${plan.price}`,
       secondaryText: 'Cancel',
       onConfirm: () => {
-        setIsVipSubscribed(true);
-        setShowVipModal(false);
-        showToast({
-          type: 'success',
-          title: 'VIP Subscription Active! 👑',
-          message: 'All VIP slips and booking codes across the app are now unlocked!',
-        });
+        void (async () => {
+          try {
+            await subscribeVip(plan.id);
+            setShowVipModal(false);
+            showToast({
+              type: 'success',
+              title: 'VIP Subscription Active! 👑',
+              message: 'All VIP slips and booking codes across the app are now unlocked!',
+            });
+          } catch (error) {
+            showToast({
+              type: 'error',
+              title: 'Subscription Failed',
+              message: error instanceof Error ? error.message : 'Unable to activate VIP access.',
+            });
+          }
+        })();
       },
     });
   };
 
-  const filteredSlips = MOCK_SLIPS.filter((slip) => {
+  const filteredSlips = slips.filter((slip) => {
     if (selectedFilter === 'All') return true;
     if (selectedFilter === 'Free') return slip.isFree;
     return slip.category === selectedFilter;
@@ -482,7 +471,7 @@ export default function BetslipScreen() {
                         {/* Subscription Plans Selection */}
                         <Text style={styles.vipPlansSectionTitle}>SELECT SUBSCRIPTION PLAN</Text>
                         <View style={styles.vipPlansGrid}>
-                          {VIP_PLANS.map((plan) => {
+                          {vipPlans.map((plan) => {
                             const isSelected = selectedPlanId === plan.id;
                             return (
                               <TouchableOpacity
@@ -519,7 +508,7 @@ export default function BetslipScreen() {
                         >
                           <Ionicons name="shield-checkmark" size={17} color={colors.textOnPrimary} />
                           <Text style={styles.vipUnlockBtnText}>
-                            Subscribe & Unlock ({VIP_PLANS.find((p) => p.id === selectedPlanId)?.price})
+                            Subscribe & Unlock ({vipPlans.find((p) => p.id === selectedPlanId)?.price})
                           </Text>
                         </TouchableOpacity>
                       </View>
@@ -638,7 +627,7 @@ export default function BetslipScreen() {
                 SELECT SUBSCRIPTION TIER
               </Text>
               <View style={styles.vipPlansGrid}>
-                {VIP_PLANS.filter((p) => p.id !== 'single').map((plan) => {
+                {vipPlans.filter((p) => p.id !== 'single').map((plan) => {
                   const isSelected = selectedPlanId === plan.id;
                   return (
                     <TouchableOpacity
@@ -678,7 +667,7 @@ export default function BetslipScreen() {
               <Ionicons name="sparkles" size={18} color={colors.textOnPrimary} />
               <Text style={styles.vipUnlockBtnText}>
                 Activate {selectedPlanId === 'monthly' ? 'Monthly Pass' : 'Weekly Pass'} (
-                {VIP_PLANS.find((p) => p.id === selectedPlanId)?.price})
+                {vipPlans.find((p) => p.id === selectedPlanId)?.price})
               </Text>
             </TouchableOpacity>
           </View>
